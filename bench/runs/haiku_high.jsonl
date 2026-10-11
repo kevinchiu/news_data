@@ -1,0 +1,80 @@
+{"qid": "6402:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.46, "output_tokens": 307, "thinking_tokens": 253, "input_tokens": 2120, "cost_usd": 0.00023701}
+{"qid": "1898:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [1], "latency_s": 4.86, "output_tokens": 625, "thinking_tokens": 570, "input_tokens": 2226, "cost_usd": 0.00039707}
+{"qid": "5647:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [14], "latency_s": 3.93, "output_tokens": 417, "thinking_tokens": 362, "input_tokens": 2533, "cost_usd": 0.00029614}
+{"qid": "12446:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [2, 4], "latency_s": 9.77, "output_tokens": 1895, "thinking_tokens": 1837, "input_tokens": 2110, "cost_usd": 0.0010309100000000001}
+{"qid": "3522:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 3.32, "output_tokens": 306, "thinking_tokens": 251, "input_tokens": 2206, "cost_usd": 0.00023737000000000004}
+{"qid": "17593:5", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 3.07, "output_tokens": 240, "thinking_tokens": 185, "input_tokens": 3556, "cost_usd": 0.00021787}
+{"qid": "15067:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 5.12, "output_tokens": 285, "thinking_tokens": 231, "input_tokens": 2205, "cost_usd": 0.00022686}
+{"qid": "10760:12", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.37, "output_tokens": 430, "thinking_tokens": 376, "input_tokens": 2583, "cost_usd": 0.00030314000000000003}
+{"qid": "9616:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 5.1, "output_tokens": 733, "thinking_tokens": 679, "input_tokens": 2207, "cost_usd": 0.00045088}
+{"qid": "5680:8", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.2, "output_tokens": 428, "thinking_tokens": 374, "input_tokens": 2466, "cost_usd": 0.00030097}
+{"qid": "12075:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [2, 3], "latency_s": 10.15, "output_tokens": 1977, "thinking_tokens": 1919, "input_tokens": 2168, "cost_usd": 0.00107249}
+{"qid": "15909:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.93, "output_tokens": 300, "thinking_tokens": 246, "input_tokens": 2239, "cost_usd": 0.0002347}
+{"qid": "15473:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 8.57, "output_tokens": 279, "thinking_tokens": 225, "input_tokens": 2625, "cost_usd": 0.00022806000000000004}
+{"qid": "5440:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.86, "output_tokens": 329, "thinking_tokens": 275, "input_tokens": 2062, "cost_usd": 0.00024743}
+{"qid": "5869:10", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 4.73, "output_tokens": 738, "thinking_tokens": 684, "input_tokens": 2286, "cost_usd": 0.00045417000000000005}
+{"qid": "9529:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1], "latency_s": 4.54, "output_tokens": 627, "thinking_tokens": 569, "input_tokens": 2297, "cost_usd": 0.00039878}
+{"qid": "1831:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 3.03, "output_tokens": 240, "thinking_tokens": 185, "input_tokens": 2204, "cost_usd": 0.00020435}
+{"qid": "15065:8", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.18, "output_tokens": 382, "thinking_tokens": 328, "input_tokens": 2486, "cost_usd": 0.00027817}
+{"qid": "11590:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1, 4, 5, 6, 7, 8, 10, 12, 13], "latency_s": 5.13, "output_tokens": 844, "thinking_tokens": 762, "input_tokens": 2519, "cost_usd": 0.0005095}
+{"qid": "17527:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.21, "output_tokens": 270, "thinking_tokens": 216, "input_tokens": 2474, "cost_usd": 0.00022205}
+{"qid": "14419:23", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 6, 10], "latency_s": 8.21, "output_tokens": 1421, "thinking_tokens": 1360, "input_tokens": 2475, "cost_usd": 0.0007975599999999999}
+{"qid": "19449:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 3.18, "output_tokens": 359, "thinking_tokens": 304, "input_tokens": 2236, "cost_usd": 0.00026417}
+{"qid": "10984:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1, 3, 5], "latency_s": 4.73, "output_tokens": 769, "thinking_tokens": 705, "input_tokens": 2312, "cost_usd": 0.00046993}
+{"qid": "20524:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 8.75, "output_tokens": 464, "thinking_tokens": 410, "input_tokens": 1951, "cost_usd": 0.00031382000000000003}
+{"qid": "5265:15", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 3.13, "output_tokens": 285, "thinking_tokens": 230, "input_tokens": 2003, "cost_usd": 0.00022484000000000002}
+{"qid": "15652:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.33, "output_tokens": 346, "thinking_tokens": 292, "input_tokens": 2902, "cost_usd": 0.00026433}
+{"qid": "4595:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1], "latency_s": 3.69, "output_tokens": 526, "thinking_tokens": 468, "input_tokens": 2339, "cost_usd": 0.0003487}
+{"qid": "8262:13", "model": "claude-haiku-5-5", "effort": "high", "matches": [7], "latency_s": 4.44, "output_tokens": 719, "thinking_tokens": 664, "input_tokens": 2012, "cost_usd": 0.00044193000000000005}
+{"qid": "425:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 2.99, "output_tokens": 284, "thinking_tokens": 229, "input_tokens": 2423, "cost_usd": 0.00022854}
+{"qid": "8058:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.85, "output_tokens": 440, "thinking_tokens": 386, "input_tokens": 2082, "cost_usd": 0.00030313000000000003}
+{"qid": "3131:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1, 2, 7, 8, 14], "latency_s": 6.68, "output_tokens": 1262, "thinking_tokens": 1192, "input_tokens": 2399, "cost_usd": 0.0007173}
+{"qid": "16494:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [0], "latency_s": 4.08, "output_tokens": 505, "thinking_tokens": 450, "input_tokens": 2178, "cost_usd": 0.00033659000000000006}
+{"qid": "12279:6", "model": "claude-haiku-5-5", "effort": "high", "matches": [4], "latency_s": 5.11, "output_tokens": 738, "thinking_tokens": 683, "input_tokens": 2134, "cost_usd": 0.00045265}
+{"qid": "9788:9", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.26, "output_tokens": 379, "thinking_tokens": 325, "input_tokens": 2318, "cost_usd": 0.00027499}
+{"qid": "11392:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.49, "output_tokens": 284, "thinking_tokens": 230, "input_tokens": 2405, "cost_usd": 0.00022836000000000004}
+{"qid": "12457:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.66, "output_tokens": 475, "thinking_tokens": 421, "input_tokens": 2187, "cost_usd": 0.00032168}
+{"qid": "14340:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.12, "output_tokens": 257, "thinking_tokens": 203, "input_tokens": 2684, "cost_usd": 0.00021765}
+{"qid": "2686:5", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.18, "output_tokens": 303, "thinking_tokens": 249, "input_tokens": 2421, "cost_usd": 0.00023802000000000003}
+{"qid": "17930:9", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.25, "output_tokens": 383, "thinking_tokens": 329, "input_tokens": 2308, "cost_usd": 0.00027689}
+{"qid": "8896:10", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 11], "latency_s": 7.79, "output_tokens": 1427, "thinking_tokens": 1369, "input_tokens": 2190, "cost_usd": 0.00079771}
+{"qid": "12718:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.61, "output_tokens": 270, "thinking_tokens": 216, "input_tokens": 2169, "cost_usd": 0.000219}
+{"qid": "15331:6", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.29, "output_tokens": 363, "thinking_tokens": 309, "input_tokens": 2132, "cost_usd": 0.00026513}
+{"qid": "4878:9", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 4.19, "output_tokens": 649, "thinking_tokens": 595, "input_tokens": 2339, "cost_usd": 0.0004102}
+{"qid": "17416:20", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 4.29, "output_tokens": 565, "thinking_tokens": 511, "input_tokens": 2531, "cost_usd": 0.00037012}
+{"qid": "18038:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.94, "output_tokens": 219, "thinking_tokens": 165, "input_tokens": 2290, "cost_usd": 0.00019471}
+{"qid": "9758:20", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.6, "output_tokens": 439, "thinking_tokens": 385, "input_tokens": 1935, "cost_usd": 0.00030116}
+{"qid": "424:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [11], "latency_s": 5.29, "output_tokens": 866, "thinking_tokens": 811, "input_tokens": 2179, "cost_usd": 0.0005171}
+{"qid": "14987:10", "model": "claude-haiku-5-5", "effort": "high", "matches": [0, 1], "latency_s": 3.58, "output_tokens": 382, "thinking_tokens": 324, "input_tokens": 2027, "cost_usd": 0.00027358}
+{"qid": "14546:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [2, 10], "latency_s": 5.77, "output_tokens": 991, "thinking_tokens": 933, "input_tokens": 2209, "cost_usd": 0.0005799}
+{"qid": "11642:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 4.26, "output_tokens": 551, "thinking_tokens": 497, "input_tokens": 2095, "cost_usd": 0.00035876}
+{"qid": "4945:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.63, "output_tokens": 402, "thinking_tokens": 348, "input_tokens": 2345, "cost_usd": 0.00028676}
+{"qid": "3804:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.06, "output_tokens": 333, "thinking_tokens": 279, "input_tokens": 2454, "cost_usd": 0.00025335}
+{"qid": "18531:11", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 5.06, "output_tokens": 683, "thinking_tokens": 629, "input_tokens": 1761, "cost_usd": 0.00042142000000000004}
+{"qid": "5392:6", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.43, "output_tokens": 408, "thinking_tokens": 354, "input_tokens": 2214, "cost_usd": 0.00028845}
+{"qid": "12730:6", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.93, "output_tokens": 254, "thinking_tokens": 200, "input_tokens": 2216, "cost_usd": 0.00021147}
+{"qid": "17682:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.32, "output_tokens": 387, "thinking_tokens": 333, "input_tokens": 2204, "cost_usd": 0.00027785}
+{"qid": "7366:18", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.7, "output_tokens": 499, "thinking_tokens": 445, "input_tokens": 2340, "cost_usd": 0.00033521}
+{"qid": "17927:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 4.1, "output_tokens": 555, "thinking_tokens": 501, "input_tokens": 2329, "cost_usd": 0.00036310000000000004}
+{"qid": "8283:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.13, "output_tokens": 299, "thinking_tokens": 245, "input_tokens": 2244, "cost_usd": 0.00023425000000000003}
+{"qid": "6167:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.81, "output_tokens": 231, "thinking_tokens": 177, "input_tokens": 2177, "cost_usd": 0.00019958000000000004}
+{"qid": "1053:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.26, "output_tokens": 345, "thinking_tokens": 291, "input_tokens": 2368, "cost_usd": 0.00025849}
+{"qid": "5860:5", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.07, "output_tokens": 355, "thinking_tokens": 301, "input_tokens": 2180, "cost_usd": 0.00026161}
+{"qid": "788:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.66, "output_tokens": 234, "thinking_tokens": 180, "input_tokens": 2346, "cost_usd": 0.00020277}
+{"qid": "1895:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.44, "output_tokens": 333, "thinking_tokens": 279, "input_tokens": 1996, "cost_usd": 0.00024877000000000005}
+{"qid": "787:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.12, "output_tokens": 264, "thinking_tokens": 210, "input_tokens": 2274, "cost_usd": 0.00021705000000000004}
+{"qid": "17337:2", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.84, "output_tokens": 214, "thinking_tokens": 160, "input_tokens": 2336, "cost_usd": 0.00019267000000000004}
+{"qid": "16536:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.97, "output_tokens": 518, "thinking_tokens": 464, "input_tokens": 2368, "cost_usd": 0.00034499000000000004}
+{"qid": "2833:19", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.65, "output_tokens": 399, "thinking_tokens": 345, "input_tokens": 2268, "cost_usd": 0.00028449}
+{"qid": "6382:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.16, "output_tokens": 324, "thinking_tokens": 270, "input_tokens": 2350, "cost_usd": 0.00024781}
+{"qid": "1453:1", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.77, "output_tokens": 237, "thinking_tokens": 183, "input_tokens": 2537, "cost_usd": 0.00020617999999999998}
+{"qid": "11557:8", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.92, "output_tokens": 256, "thinking_tokens": 202, "input_tokens": 2236, "cost_usd": 0.00021266999999999998}
+{"qid": "14940:4", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.01, "output_tokens": 270, "thinking_tokens": 216, "input_tokens": 2165, "cost_usd": 0.00021896000000000003}
+{"qid": "17170:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.27, "output_tokens": 332, "thinking_tokens": 278, "input_tokens": 2332, "cost_usd": 0.00025163000000000003}
+{"qid": "2995:5", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.14, "output_tokens": 285, "thinking_tokens": 231, "input_tokens": 2195, "cost_usd": 0.00022676}
+{"qid": "3364:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 5.26, "output_tokens": 809, "thinking_tokens": 755, "input_tokens": 2253, "cost_usd": 0.00048934}
+{"qid": "7870:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.46, "output_tokens": 387, "thinking_tokens": 333, "input_tokens": 2379, "cost_usd": 0.0002796}
+{"qid": "3706:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 2.53, "output_tokens": 197, "thinking_tokens": 143, "input_tokens": 2171, "cost_usd": 0.00018252}
+{"qid": "17812:5", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.61, "output_tokens": 359, "thinking_tokens": 305, "input_tokens": 2276, "cost_usd": 0.00026457}
+{"qid": "270:3", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.03, "output_tokens": 270, "thinking_tokens": 216, "input_tokens": 2237, "cost_usd": 0.00021968000000000004}
+{"qid": "4766:7", "model": "claude-haiku-5-5", "effort": "high", "matches": [], "latency_s": 3.15, "output_tokens": 255, "thinking_tokens": 201, "input_tokens": 2110, "cost_usd": 0.00021091000000000003}

@@ -1,0 +1,29 @@
+{
+  "retrieval": {
+    "k": 30,
+    "index": "quotation",
+    "query_template": "raw",
+    "speaker_filter": "off",
+    "min_urls": 1,
+    "window_days": null
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "You check whether quotations from news coverage are the source of a claim.\n\nEach candidate is a quotation with its attributed speaker, the date it was first seen, and an automatic speaker annotation. Reported claims usually paraphrase one specific remark made on one occasion. A candidate MATCHES only if it is that remark (or a version of it): the speaker asserts the claim's central statement, and the claim's distinctive details (its particular points, figures, names, images or turns of phrase) appear in the quotation, possibly reworded, with nothing conflicting. Partial quotations still match if what they contain lines up closely with the claim.\n\nCandidates do NOT match if they are only on the same topic, make a different or opposite point, concern a different event, period or figure, or are generic remarks the claim does not report. Speakers often repeat a theme across interviews; a quotation by the same speaker that expresses a similar idea in different terms, or lacks most of the claim's specific points, is a different remark and does NOT match.\n\nSpeaker annotations are automatic and can be wrong. Never reject on the annotation alone; but for candidates marked as unknown or different speaker, require an especially close content match before accepting.\n\nReturn the ids of all matching candidates (an empty list if none).",
+    "show_date": true,
+    "speaker_hint": true,
+    "show_num_urls": false
+  },
+  "timeline": {
+    "variants": "direct",
+    "original_excludes": [
+      "wire",
+      "press_release",
+      "aggregator",
+      "feed"
+    ]
+  },
+  "domain_overrides": []
+}

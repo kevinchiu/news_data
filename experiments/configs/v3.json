@@ -1,0 +1,29 @@
+{
+  "retrieval": {
+    "k": 30,
+    "index": "quotation_speaker",
+    "query_template": "content_plus_speaker",
+    "speaker_filter": "off",
+    "min_urls": 1,
+    "window_days": null
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "You check whether quotations from news coverage state the same fact as a claim.\n\nEach candidate is a quotation with its attributed speaker and the date it was first seen. A candidate MATCHES only if the speaker, in that quotation, asserts the claim's central statement: same event, action, figure or position, with no conflicting key details. The claim is a paraphrase of one specific quotation; its wording may differ substantially from it (synonyms, reordered clauses, reported speech).\n\nCompleteness (claim to quotation): list the key components of the claim (each distinct assertion, plus any specific named items, numbers, or conditions). The quotation must itself contain every one of them, possibly reworded. If the quotation contains only some of them, for example because it is cut off before the rest or is a different sentence from the same occasion, it does NOT match.\n\nExtent (quotation to claim): the same remark often circulates in several versions of different length or phrasing. The claim reports one particular version. If a candidate also contains further substantive assertions, clauses or sentences that the claim does not reflect at all (for example a longer passage containing the claimed content plus extra material before or after it), it is a different version and does NOT match. Minor fillers, interjections, or speech tags do not count as extra material. Likewise, a statement that makes a similar point with a materially different framing, hedge, or set of figures does NOT match.\n\nSpeaker: attributions are automatic and sometimes wrong or missing (\"None\"). A clearly different speaker making a similar statement does NOT match. For a candidate with a missing speaker, apply a stricter test: it matches only if its wording closely tracks the claim's specific content, not just its theme or general sentiment.\n\nA candidate also does NOT match if it is only on the same topic, makes a different or opposite point, concerns a different event, period or figure, or is a generic remark the claim does not report.\n\nReturn the ids of all matching candidates (an empty list if none).",
+    "show_date": true,
+    "speaker_hint": false,
+    "show_num_urls": false
+  },
+  "timeline": {
+    "variants": "direct",
+    "original_excludes": [
+      "wire",
+      "press_release",
+      "aggregator",
+      "feed"
+    ]
+  },
+  "domain_overrides": []
+}

@@ -1,0 +1,29 @@
+{
+  "retrieval": {
+    "k": 30,
+    "index": "quotation",
+    "query_template": "raw",
+    "speaker_filter": "off",
+    "min_urls": 1,
+    "window_days": null
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "@prompts/verify_quote.txt",
+    "show_date": true,
+    "speaker_hint": false,
+    "show_num_urls": false
+  },
+  "timeline": {
+    "variants": "direct",
+    "original_excludes": [
+      "wire",
+      "press_release",
+      "aggregator",
+      "feed"
+    ]
+  },
+  "domain_overrides": []
+}

@@ -1,0 +1,80 @@
+{"qid": "6402:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.93, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2118, "cost_usd": 0.017995999999999998}
+{"qid": "1898:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 6.96, "output_tokens": 541, "thinking_tokens": 229, "input_tokens": 2224, "cost_usd": 0.028603999999999997}
+{"qid": "5647:2", "model": "claude-opus-5-5", "effort": "high", "matches": [14], "latency_s": 7.24, "output_tokens": 546, "thinking_tokens": 120, "input_tokens": 2531, "cost_usd": 0.0256922}
+{"qid": "12446:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 11.3, "output_tokens": 992, "thinking_tokens": 468, "input_tokens": 2108, "cost_usd": 0.036696}
+{"qid": "3522:3", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 3.14, "output_tokens": 54, "thinking_tokens": 0, "input_tokens": 2204, "cost_usd": 0.018704}
+{"qid": "17593:5", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 2.91, "output_tokens": 54, "thinking_tokens": 0, "input_tokens": 3554, "cost_usd": 0.029504}
+{"qid": "15067:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.09, "output_tokens": 406, "thinking_tokens": 64, "input_tokens": 2203, "cost_usd": 0.0202682}
+{"qid": "10760:12", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.55, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2581, "cost_usd": 0.0163122}
+{"qid": "9616:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 6.92, "output_tokens": 567, "thinking_tokens": 231, "input_tokens": 2205, "cost_usd": 0.0235042}
+{"qid": "5680:8", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.56, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2464, "cost_usd": 0.0153762}
+{"qid": "12075:2", "model": "claude-opus-5-5", "effort": "high", "matches": [2, 3], "latency_s": 10.27, "output_tokens": 963, "thinking_tokens": 470, "input_tokens": 2166, "cost_usd": 0.0311122}
+{"qid": "15909:4", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.8, "output_tokens": 230, "thinking_tokens": 21, "input_tokens": 2237, "cost_usd": 0.0170202}
+{"qid": "15473:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.47, "output_tokens": 312, "thinking_tokens": 40, "input_tokens": 2623, "cost_usd": 0.021748200000000002}
+{"qid": "5440:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.87, "output_tokens": 326, "thinking_tokens": 95, "input_tokens": 2060, "cost_usd": 0.0175242}
+{"qid": "5869:10", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.69, "output_tokens": 428, "thinking_tokens": 81, "input_tokens": 2284, "cost_usd": 0.0213562}
+{"qid": "9529:3", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 8.5, "output_tokens": 727, "thinking_tokens": 458, "input_tokens": 2295, "cost_usd": 0.027424200000000003}
+{"qid": "1831:2", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 3.03, "output_tokens": 54, "thinking_tokens": 0, "input_tokens": 2202, "cost_usd": 0.0132202}
+{"qid": "15065:8", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.58, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2484, "cost_usd": 0.0155362}
+{"qid": "11590:4", "model": "claude-opus-5-5", "effort": "high", "matches": [1, 12], "latency_s": 8.66, "output_tokens": 803, "thinking_tokens": 379, "input_tokens": 2517, "cost_usd": 0.030720200000000003}
+{"qid": "17527:4", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.78, "output_tokens": 322, "thinking_tokens": 41, "input_tokens": 2472, "cost_usd": 0.0207402}
+{"qid": "14419:23", "model": "claude-opus-5-5", "effort": "high", "matches": [0, 10], "latency_s": 9.8, "output_tokens": 885, "thinking_tokens": 399, "input_tokens": 2473, "cost_usd": 0.0320082}
+{"qid": "19449:2", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 5.34, "output_tokens": 319, "thinking_tokens": 78, "input_tokens": 2234, "cost_usd": 0.0187762}
+{"qid": "10984:1", "model": "claude-opus-5-5", "effort": "high", "matches": [0, 1, 3, 5], "latency_s": 5.74, "output_tokens": 519, "thinking_tokens": 74, "input_tokens": 2310, "cost_usd": 0.0233842}
+{"qid": "20524:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.63, "output_tokens": 113, "thinking_tokens": 59, "input_tokens": 1949, "cost_usd": 0.0123762}
+{"qid": "5265:15", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 3.61, "output_tokens": 54, "thinking_tokens": 0, "input_tokens": 2001, "cost_usd": 0.0116122}
+{"qid": "15652:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.49, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2900, "cost_usd": 0.0188642}
+{"qid": "4595:2", "model": "claude-opus-5-5", "effort": "high", "matches": [0, 1], "latency_s": 6.98, "output_tokens": 568, "thinking_tokens": 196, "input_tokens": 2337, "cost_usd": 0.0245802}
+{"qid": "8262:13", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 9.62, "output_tokens": 773, "thinking_tokens": 384, "input_tokens": 2010, "cost_usd": 0.026064200000000003}
+{"qid": "425:4", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 2.36, "output_tokens": 54, "thinking_tokens": 0, "input_tokens": 2421, "cost_usd": 0.0149722}
+{"qid": "8058:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.93, "output_tokens": 85, "thinking_tokens": 0, "input_tokens": 2080, "cost_usd": 0.0128642}
+{"qid": "3131:4", "model": "claude-opus-5-5", "effort": "high", "matches": [0, 1, 2, 3, 4], "latency_s": 11.33, "output_tokens": 1031, "thinking_tokens": 514, "input_tokens": 2397, "cost_usd": 0.0343202}
+{"qid": "16494:2", "model": "claude-opus-5-5", "effort": "high", "matches": [0], "latency_s": 5.15, "output_tokens": 323, "thinking_tokens": 65, "input_tokens": 2176, "cost_usd": 0.018392199999999997}
+{"qid": "12279:6", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.03, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2132, "cost_usd": 0.0127202}
+{"qid": "9788:9", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.73, "output_tokens": 353, "thinking_tokens": 48, "input_tokens": 2316, "cost_usd": 0.0201122}
+{"qid": "11392:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.51, "output_tokens": 292, "thinking_tokens": 34, "input_tokens": 2403, "cost_usd": 0.0195882}
+{"qid": "12457:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.47, "output_tokens": 339, "thinking_tokens": 0, "input_tokens": 2185, "cost_usd": 0.0187842}
+{"qid": "14340:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.41, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2682, "cost_usd": 0.0170402}
+{"qid": "2686:5", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.7, "output_tokens": 343, "thinking_tokens": 77, "input_tokens": 2419, "cost_usd": 0.0207362}
+{"qid": "17930:9", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.27, "output_tokens": 373, "thinking_tokens": 68, "input_tokens": 2306, "cost_usd": 0.0204322}
+{"qid": "8896:10", "model": "claude-opus-5-5", "effort": "high", "matches": [6], "latency_s": 9.54, "output_tokens": 860, "thinking_tokens": 424, "input_tokens": 2188, "cost_usd": 0.029228200000000003}
+{"qid": "12718:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.22, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2167, "cost_usd": 0.0129202}
+{"qid": "15331:6", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.83, "output_tokens": 249, "thinking_tokens": 35, "input_tokens": 2130, "cost_usd": 0.016544200000000002}
+{"qid": "4878:9", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.86, "output_tokens": 440, "thinking_tokens": 65, "input_tokens": 2337, "cost_usd": 0.0220202}
+{"qid": "17416:20", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.44, "output_tokens": 306, "thinking_tokens": 20, "input_tokens": 2529, "cost_usd": 0.0208762}
+{"qid": "18038:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.6, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2288, "cost_usd": 0.0138882}
+{"qid": "9758:20", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.01, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 1933, "cost_usd": 0.0110482}
+{"qid": "424:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.84, "output_tokens": 481, "thinking_tokens": 110, "input_tokens": 2177, "cost_usd": 0.0215602}
+{"qid": "14987:10", "model": "claude-opus-5-5", "effort": "high", "matches": [0, 1], "latency_s": 5.91, "output_tokens": 415, "thinking_tokens": 140, "input_tokens": 2025, "cost_usd": 0.019024199999999998}
+{"qid": "14546:4", "model": "claude-opus-5-5", "effort": "high", "matches": [10], "latency_s": 5.89, "output_tokens": 462, "thinking_tokens": 146, "input_tokens": 2207, "cost_usd": 0.0214202}
+{"qid": "11642:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.41, "output_tokens": 430, "thinking_tokens": 148, "input_tokens": 2093, "cost_usd": 0.0198682}
+{"qid": "4945:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.18, "output_tokens": 428, "thinking_tokens": 26, "input_tokens": 2343, "cost_usd": 0.0218282}
+{"qid": "3804:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.89, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2452, "cost_usd": 0.015200199999999999}
+{"qid": "18531:11", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.74, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 1759, "cost_usd": 0.0096562}
+{"qid": "5392:6", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.53, "output_tokens": 57, "thinking_tokens": 0, "input_tokens": 2212, "cost_usd": 0.0133602}
+{"qid": "12730:6", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.65, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2214, "cost_usd": 0.0132962}
+{"qid": "17682:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 8.79, "output_tokens": 382, "thinking_tokens": 39, "input_tokens": 2202, "cost_usd": 0.019780199999999998}
+{"qid": "7366:18", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.42, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2338, "cost_usd": 0.0142882}
+{"qid": "17927:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.73, "output_tokens": 437, "thinking_tokens": 73, "input_tokens": 2327, "cost_usd": 0.0218802}
+{"qid": "8283:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.0, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2242, "cost_usd": 0.0135202}
+{"qid": "6167:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.97, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2175, "cost_usd": 0.0129842}
+{"qid": "1053:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.45, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2366, "cost_usd": 0.0145122}
+{"qid": "5860:5", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.57, "output_tokens": 226, "thinking_tokens": 0, "input_tokens": 2178, "cost_usd": 0.0164682}
+{"qid": "788:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.81, "output_tokens": 83, "thinking_tokens": 29, "input_tokens": 2344, "cost_usd": 0.0149362}
+{"qid": "1895:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 4.71, "output_tokens": 287, "thinking_tokens": 28, "input_tokens": 1994, "cost_usd": 0.0162162}
+{"qid": "787:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.08, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2272, "cost_usd": 0.0137602}
+{"qid": "17337:2", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.53, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2334, "cost_usd": 0.0142562}
+{"qid": "16536:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.54, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2366, "cost_usd": 0.0145122}
+{"qid": "2833:19", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.96, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2266, "cost_usd": 0.013712199999999999}
+{"qid": "6382:4", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.18, "output_tokens": 432, "thinking_tokens": 70, "input_tokens": 2348, "cost_usd": 0.0219482}
+{"qid": "1453:1", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.15, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2535, "cost_usd": 0.015864200000000002}
+{"qid": "11557:8", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.41, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2234, "cost_usd": 0.0134562}
+{"qid": "14940:4", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.79, "output_tokens": 320, "thinking_tokens": 33, "input_tokens": 2163, "cost_usd": 0.0182282}
+{"qid": "17170:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.29, "output_tokens": 380, "thinking_tokens": 54, "input_tokens": 2330, "cost_usd": 0.0207642}
+{"qid": "2995:5", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.26, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2193, "cost_usd": 0.0131282}
+{"qid": "3364:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.43, "output_tokens": 423, "thinking_tokens": 132, "input_tokens": 2251, "cost_usd": 0.020992199999999996}
+{"qid": "7870:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 5.01, "output_tokens": 365, "thinking_tokens": 66, "input_tokens": 2377, "cost_usd": 0.0208402}
+{"qid": "3706:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.46, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2169, "cost_usd": 0.0129362}
+{"qid": "17812:5", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 3.08, "output_tokens": 62, "thinking_tokens": 0, "input_tokens": 2274, "cost_usd": 0.013956199999999998}
+{"qid": "270:3", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 6.72, "output_tokens": 404, "thinking_tokens": 69, "input_tokens": 2235, "cost_usd": 0.0204842}
+{"qid": "4766:7", "model": "claude-opus-5-5", "effort": "high", "matches": [], "latency_s": 2.99, "output_tokens": 53, "thinking_tokens": 0, "input_tokens": 2108, "cost_usd": 0.0124482}
