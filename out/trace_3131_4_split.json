@@ -1,0 +1,139 @@
+{
+  "claim": "The central bank's surprise signal followed its strenuous efforts last week to prevent market forces from bringing down base rates before the U.K. Budget on March 17.",
+  "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+  "as_of": "1987-03-09T10:58:30.510000",
+  "facts": [
+    {
+      "text": "The Bank of England sent a surprise signal.",
+      "kind": "new",
+      "trace": {
+        "claim": "The Bank of England sent a surprise signal.",
+        "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+        "as_of": "1987-03-09T10:58:30.510000",
+        "origin": {
+          "sid": "3007:3",
+          "doc_id": 3007,
+          "date": "1987-03-09T08:08:57.160000",
+          "slug": "BC-NATIONAL-WESTMINSTER",
+          "topics": [
+            "interest"
+          ],
+          "kind": "sentence",
+          "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+          "score": 17.607107162475586,
+          "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+          "hop": 0,
+          "attribution": null
+        },
+        "timeline": [
+          {
+            "sid": "3007:3",
+            "doc_id": 3007,
+            "date": "1987-03-09T08:08:57.160000",
+            "slug": "BC-NATIONAL-WESTMINSTER",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+            "score": 17.607107162475586,
+            "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+            "hop": 0,
+            "attribution": null
+          },
+          {
+            "sid": "3043:3",
+            "doc_id": 3043,
+            "date": "1987-03-09T09:27:57.440000",
+            "slug": "BC-NATIONAL-WESTMINSTER",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+            "score": 17.607107162475586,
+            "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+            "hop": 0,
+            "attribution": null
+          },
+          {
+            "sid": "3103:4",
+            "doc_id": 3103,
+            "date": "1987-03-09T10:37:01.190000",
+            "slug": "BC-BARCLAYS,-MIDLAND-FOL",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "The base rate reductions came after the Bank of England cut its dealing rates this morning in a signal to the money markets that it would not resist a half percentage point drop in bank base lending rates, market sources said.",
+            "score": 12.229086875915527,
+            "headline": "BARCLAYS, MIDLAND FOLLOW NATWEST BASE RATE CUT",
+            "hop": 0,
+            "attribution": "market sources"
+          },
+          {
+            "sid": "3122:4",
+            "doc_id": 3122,
+            "date": "1987-03-09T10:54:36.020000",
+            "slug": "BC-BARCLAYS,-MIDLAND-FOL",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "The base rate reductions came after the Bank of England cut its dealing rates this morning in a signal to the money markets that it would not resist a half percentage point drop in bank base lending rates, market sources said.",
+            "score": 12.229086875915527,
+            "headline": "BARCLAYS, MIDLAND FOLLOW NATWEST BASE RATE CUT",
+            "hop": 0,
+            "attribution": "market sources"
+          },
+          {
+            "sid": "3128:3",
+            "doc_id": 3128,
+            "date": "1987-03-09T10:57:54.020000",
+            "slug": "BC-LLOYDS-BANK-MATCHES-B",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "National Westminster Bank Plc <NWBL.L> led the way this morning after the Bank of England lowered its dealing rates in a signal that it would tolerate a half percentage point reduction.",
+            "score": 13.763245582580566,
+            "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+            "hop": 0,
+            "attribution": null
+          },
+          {
+            "sid": "3128:4",
+            "doc_id": 3128,
+            "date": "1987-03-09T10:57:54.020000",
+            "slug": "BC-LLOYDS-BANK-MATCHES-B",
+            "topics": [
+              "interest"
+            ],
+            "kind": "sentence",
+            "text": "The central bank's surprise signal followed its strenuous efforts last week to prevent market forces from bringing down base rates before the U.K. Budget on March 17.",
+            "score": 13.187761306762695,
+            "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+            "hop": 0,
+            "attribution": null
+          }
+        ],
+        "llm_calls": {
+          "made": 5,
+          "cached": 0
+        }
+      }
+    },
+    {
+      "text": "The Bank of England made strenuous efforts in the week before 1987-03-09 to prevent market forces from bringing down base rates before the U.K. Budget.",
+      "kind": "background"
+    },
+    {
+      "text": "The U.K. Budget was scheduled for 1987-03-17.",
+      "kind": "background"
+    }
+  ],
+  "llm_calls": {
+    "made": 6,
+    "cached": 0
+  }
+}

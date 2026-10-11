@@ -1,0 +1,76 @@
+{
+  "claim": "Texscan Corp said it has reached agreement in principle with bank lenders United Bancorp of Arizona <UBAZ> and Security Pacific Corp <SPC> on a plan of reorganization from Chapter 11 bankruptcy.",
+  "headline": "<TEXSCAN CORP> IN AGREEMENT WITH LENDERS",
+  "as_of": "1987-03-30T14:07:48.640000",
+  "origin": {
+    "sid": "10819:0",
+    "doc_id": 10819,
+    "date": "1987-03-30T10:24:42.870000",
+    "slug": "BC-TEXSCAN-HAS-TENTATIVE",
+    "topics": [],
+    "kind": "headline",
+    "text": "TEXSCAN HAS TENTATIVE REORGANIZATION PLAN",
+    "score": 30.222732543945312,
+    "headline": "TEXSCAN HAS TENTATIVE REORGANIZATION PLAN",
+    "hop": 0,
+    "attribution": null
+  },
+  "timeline": [
+    {
+      "sid": "10819:0",
+      "doc_id": 10819,
+      "date": "1987-03-30T10:24:42.870000",
+      "slug": "BC-TEXSCAN-HAS-TENTATIVE",
+      "topics": [],
+      "kind": "headline",
+      "text": "TEXSCAN HAS TENTATIVE REORGANIZATION PLAN",
+      "score": 30.222732543945312,
+      "headline": "TEXSCAN HAS TENTATIVE REORGANIZATION PLAN",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "10819:1",
+      "doc_id": 10819,
+      "date": "1987-03-30T10:24:42.870000",
+      "slug": "BC-TEXSCAN-HAS-TENTATIVE",
+      "topics": [],
+      "kind": "sentence",
+      "text": "Texscan Corp said it has agreed in principle with its lending banks -- United Bank of Arizona and Security Pacific Bank -- on a joint plan of reorganization.",
+      "score": 55.108062744140625,
+      "headline": "TEXSCAN HAS TENTATIVE REORGANIZATION PLAN",
+      "hop": 0,
+      "attribution": "Texscan Corp"
+    },
+    {
+      "sid": "10850:0",
+      "doc_id": 10850,
+      "date": "1987-03-30T11:38:54.310000",
+      "slug": "BC-TEXSCAN-REACHES-REORG",
+      "topics": [],
+      "kind": "headline",
+      "text": "TEXSCAN REACHES REORGANIZATION AGREEMENT",
+      "score": 29.4338321685791,
+      "headline": "TEXSCAN REACHES REORGANIZATION AGREEMENT",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "10850:1",
+      "doc_id": 10850,
+      "date": "1987-03-30T11:38:54.310000",
+      "slug": "BC-TEXSCAN-REACHES-REORG",
+      "topics": [],
+      "kind": "sentence",
+      "text": "<Texscan Corp>, which filed for bankruptcy in November 1985, said it reached an agreement in principle with its lending bank group on a joint reorganization plan.",
+      "score": 45.051353454589844,
+      "headline": "TEXSCAN REACHES REORGANIZATION AGREEMENT",
+      "hop": 0,
+      "attribution": null
+    }
+  ],
+  "llm_calls": {
+    "made": 4,
+    "cached": 0
+  }
+}

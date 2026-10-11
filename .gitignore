@@ -1,0 +1,11 @@
+# raw/processed data, DuckDB file and LLM cache (tens of GB; rebuild with scripts/)
+data/
+# local environment and caches
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# runtime logs
+*.log
+# runtime lock files
+*.lock

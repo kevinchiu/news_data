@@ -1,0 +1,193 @@
+{
+  "claim": "The Bank of England signalled it would accept a half point cut in base lending rates",
+  "headline": null,
+  "as_of": "1987-03-20",
+  "origin": {
+    "sid": "3007:3",
+    "doc_id": 3007,
+    "date": "1987-03-09T08:08:57.160000",
+    "slug": "BC-NATIONAL-WESTMINSTER",
+    "topics": [
+      "interest"
+    ],
+    "kind": "sentence",
+    "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+    "score": 22.162525177001953,
+    "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+    "hop": 0,
+    "attribution": null
+  },
+  "timeline": [
+    {
+      "sid": "3007:3",
+      "doc_id": 3007,
+      "date": "1987-03-09T08:08:57.160000",
+      "slug": "BC-NATIONAL-WESTMINSTER",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+      "score": 22.162525177001953,
+      "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "3043:3",
+      "doc_id": 3043,
+      "date": "1987-03-09T09:27:57.440000",
+      "slug": "BC-NATIONAL-WESTMINSTER",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "Its move followed a signal from the Bank of England earlier this afternoon that it would endorse a half point cut in the base rate, a surprise move following its strong signals last week that such a move would be premature.",
+      "score": 22.162525177001953,
+      "headline": "NATIONAL WESTMINSTER BANK CUTS BASE RATE",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "3103:4",
+      "doc_id": 3103,
+      "date": "1987-03-09T10:37:01.190000",
+      "slug": "BC-BARCLAYS,-MIDLAND-FOL",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "The base rate reductions came after the Bank of England cut its dealing rates this morning in a signal to the money markets that it would not resist a half percentage point drop in bank base lending rates, market sources said.",
+      "score": 32.6710205078125,
+      "headline": "BARCLAYS, MIDLAND FOLLOW NATWEST BASE RATE CUT",
+      "hop": 0,
+      "attribution": "market sources"
+    },
+    {
+      "sid": "3111:7",
+      "doc_id": 3111,
+      "date": "1987-03-09T10:47:32.750000",
+      "slug": "BC-U.K.-ISSUES-ONE-BILLI",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "The Bank this morning finally signalled it was prepared to see lower rates and U.K. Clearing banks this afternoon announced cuts in their base lending rates to 10.5 pct from 11 pct.",
+      "score": 23.52863311767578,
+      "headline": "U.K. ISSUES ONE BILLION STG BOND TRANCHE",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "3122:4",
+      "doc_id": 3122,
+      "date": "1987-03-09T10:54:36.020000",
+      "slug": "BC-BARCLAYS,-MIDLAND-FOL",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "The base rate reductions came after the Bank of England cut its dealing rates this morning in a signal to the money markets that it would not resist a half percentage point drop in bank base lending rates, market sources said.",
+      "score": 32.6710205078125,
+      "headline": "BARCLAYS, MIDLAND FOLLOW NATWEST BASE RATE CUT",
+      "hop": 0,
+      "attribution": "market sources"
+    },
+    {
+      "sid": "3128:3",
+      "doc_id": 3128,
+      "date": "1987-03-09T10:57:54.020000",
+      "slug": "BC-LLOYDS-BANK-MATCHES-B",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "National Westminster Bank Plc <NWBL.L> led the way this morning after the Bank of England lowered its dealing rates in a signal that it would tolerate a half percentage point reduction.",
+      "score": 19.9511775970459,
+      "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "3133:3",
+      "doc_id": 3133,
+      "date": "1987-03-09T10:59:44.610000",
+      "slug": "BC-LLOYDS-BANK-MATCHES-B",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "National Westminster Bank Plc led the way this morning after the Bank of England lowered its dealing rates in a signal that it would tolerate a half percentage point reduction.",
+      "score": 21.031448364257812,
+      "headline": "LLOYDS BANK MATCHES BASE RATE CUT TO 10.5 PCT",
+      "hop": 0,
+      "attribution": null
+    },
+    {
+      "sid": "3137:1",
+      "doc_id": 3137,
+      "date": "1987-03-09T11:03:05.710000",
+      "slug": "BC-UK-MONEY-RATES-FALL-A",
+      "topics": [
+        "money-fx",
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "A half point cut in base lending rates was announced by the big four clearing banks today after the Bank of England finally endorsed such a move following weeks of downward pressure, dealers said.",
+      "score": 28.935977935791016,
+      "headline": "UK MONEY RATES FALL AS BANK APPROVES BASE RATE CUT",
+      "hop": 0,
+      "attribution": "dealers"
+    },
+    {
+      "sid": "3219:3",
+      "doc_id": 3219,
+      "date": "1987-03-09T12:37:13.540000",
+      "slug": "BC-CITIBANK-FOLLOWS-U.K.",
+      "topics": [
+        "interest"
+      ],
+      "kind": "sentence",
+      "text": "Lower rates were signalled by the Bank of England this morning in an attempt to curb recent upward pressure on the pound, market sources said.",
+      "score": 21.508543014526367,
+      "headline": "CITIBANK FOLLOWS U.K. BASE RATE CUT TO 10.5 PCT",
+      "hop": 0,
+      "attribution": "market sources"
+    },
+    {
+      "sid": "3283:2",
+      "doc_id": 3283,
+      "date": "1987-03-09T14:03:57.320000",
+      "slug": "BC-PRIMARY-EUROSTERLING",
+      "topics": [
+        "interest",
+        "stg"
+      ],
+      "kind": "sentence",
+      "text": "The Bank of England finally gave way to a 1/2 point cut in banks' base lending rates earlier today, but dealers said this had been largely discounted and was not likely to detract from the current popularity of sterling-denominated investments.",
+      "score": 23.47783660888672,
+      "headline": "PRIMARY EUROSTERLING MARKET BOOMS DESPITE RATE CUT",
+      "hop": 0,
+      "attribution": "but dealers"
+    },
+    {
+      "sid": "6362:0",
+      "doc_id": 6362,
+      "date": "1987-03-18T05:07:59",
+      "slug": "BC-BANK-OF-ENGLAND-SIGNA",
+      "topics": [
+        "interest"
+      ],
+      "kind": "headline",
+      "text": "BANK OF ENGLAND SIGNALS HALF POINT CUT IN SHORT TERM RATES - DEALERS",
+      "score": 31.66742515563965,
+      "headline": "BANK OF ENGLAND SIGNALS HALF POINT CUT IN SHORT TERM RATES - DEALERS",
+      "hop": 0,
+      "attribution": null
+    }
+  ],
+  "llm_calls": {
+    "made": 5,
+    "cached": 0
+  }
+}
