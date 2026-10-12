@@ -1,0 +1,44 @@
+pattern,kind,grp,note
+msn.com,aggregator,msn,republishes partner content
+%.einnews.com,aggregator,einnews,topic feeds of other outlets' stories
+onenewspage.com,aggregator,onenewspage,
+bignewsnetwork.com,aggregator,bignewsnetwork,carries ANI/IANS wire copy
+allafrica.com,aggregator,allafrica,republishes African outlets
+miragenews.com,press_release,miragenews,press-release republisher
+newkerala.com,aggregator,ani_syndication,carries ANI/IANS wire copy
+prokerala.com,aggregator,ani_syndication,carries ANI/IANS wire copy
+canindia.com,aggregator,ani_syndication,carries IANS wire copy
+daijiworld.com,outlet,,
+aninews.in,wire,ani,Asian News International
+upi.com,wire,upi,United Press International
+apnews.com,wire,ap,
+reuters.com,wire,reuters,
+%.reuters.com,wire,reuters,
+afp.com,wire,afp,
+prnewswire.com,press_release,prnewswire,
+%.prnewswire.com,press_release,prnewswire,
+businesswire.com,press_release,businesswire,
+globenewswire.com,press_release,globenewswire,
+%.globenewswire.com,press_release,globenewswire,
+feeds.%,feed,,RSS mirror of a parent outlet
+rss.%,feed,,RSS mirror of a parent outlet
+mirror.co.uk,outlet,reach,
+irishmirror.ie,outlet,reach,
+express.co.uk,outlet,reach,
+dailystar.co.uk,outlet,reach,
+dailyrecord.co.uk,outlet,reach,
+sfgate.com,outlet,hearst,
+chron.com,outlet,hearst,
+ctpost.com,outlet,hearst,
+stamfordadvocate.com,outlet,hearst,
+newstimes.com,outlet,hearst,
+thehour.com,outlet,hearst,
+greenwichtime.com,outlet,hearst,
+nhregister.com,outlet,hearst,
+mysanantonio.com,outlet,hearst,
+expressnews.com,outlet,hearst,
+smh.com.au,outlet,nine,
+theage.com.au,outlet,nine,
+brisbanetimes.com.au,outlet,nine,
+watoday.com.au,outlet,nine,
+canberratimes.com.au,outlet,acm,

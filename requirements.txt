@@ -1,0 +1,7 @@
+# Python 3.12+ (developed on 3.14). Install: uv venv .venv && uv pip install --python .venv/bin/python -r requirements.txt
+duckdb==1.5.6
+pyarrow==26.0.0
+numpy==2.5.4
+scipy==1.18.1
+anthropic==1.13.0
+rank-bm25==0.2.2

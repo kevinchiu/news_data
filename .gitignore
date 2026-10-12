@@ -1,5 +1,7 @@
-# raw/processed data, DuckDB file and LLM cache (tens of GB; rebuild with scripts/)
-data/
+# raw/processed data, DuckDB file and LLM cache (tens of GB; fetch + rebuild with scripts/get_data.py)
+data/*
+# ...except the hand-curated domain labels, which the build needs
+!data/domain_labels.csv
 # local environment and caches
 .venv/
 __pycache__/

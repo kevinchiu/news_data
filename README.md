@@ -18,6 +18,20 @@ The figures come from the 2026-10-11 run (`experiments/state.json`). The locked 
 been scored again yet. Prepared by Aleks Jakulin (data.Flowers) with Kevin Chiu (Plastachio) at an
 RSIHOUSE × Sundai Club hack.
 
+## Setup
+
+The datasets are not in the repo (tens of GB). Fetch and rebuild them with:
+
+```
+uv venv .venv && uv pip install --python .venv/bin/python -r requirements.txt
+.venv/bin/python -I scripts/get_data.py            # Quotebank 2020 + Reuters-21578, then build data/news.duckdb
+.venv/bin/python -I scripts/get_data.py --gdelt    # optional: also GDELT wire rows (Jan-Apr 2020)
+```
+
+Downloads resume and are checked against the published MD5s; the build needs ~25 GB free disk,
+takes ~20-30 minutes and makes no LLM calls. The tracer, loop and app call Claude through headless
+Claude Code (`claude -p`), so a logged-in Claude Code install is required to run them.
+
 ## Data
 
 | Source | What | Where |
@@ -48,6 +62,10 @@ All tunables live in `config/` (`scripts/qb_config.py` defines what the loop may
 - `bench/qb_bench.jsonl` (`scripts/make_qb_bench.py`): quotes carried by ≥5 outlets; query = a
   Haiku paraphrase of a later outlet's report; answer = the earliest timed mention before it.
   Splits: train 145 / val 73 / test 146 (test is scored only at baseline and at the end).
+  Ground truth v2 (`scripts/fix_ground_truth.py`): an item's quote also counts near-identical
+  same-speaker versions that the 8-gram links missed (≥70% word containment, a shared 5-word run,
+  first seen within 14 days), so an earlier rendering of the same quote is a correct answer, not a
+  false positive. v1 files are kept as `*.jsonl.v1`; `improve.py rebaseline` re-scores after the change.
 - `bench/qb_watch.jsonl` (`scripts/make_watch_set.py`): 100 extra held-out items, scored live by
   `scripts/watch_scorer.py` for the dashboard only; the loop never reads it.
 - `scripts/evaluate.py`: recall@k, verifier recall, false-positive-earlier, first appearance
@@ -55,7 +73,8 @@ All tunables live in `config/` (`scripts/qb_config.py` defines what the loop may
 - `scripts/improve.py`: each round Claude Opus 5.5 reads failures and proposes up to three config
   changes; candidates are screened (retrieval changes free via recall@k), the best is scored on a
   60-item train subset and accepted only if it fixes ≥ threshold more items than it breaks (threshold
-  from measured run-to-run noise) and doesn't lose on val. Lines can run in parallel with a knob
+  from measured run-to-run noise) and doesn't lose on val. Borderline candidates (+1/+2) get a second
+  look on the full 145-item train split against a threshold scaled to that size. Lines can run in parallel with a knob
   focus (`--line/--focus`) and be combined with `merge`. Log: `experiments/**/ledger.jsonl`.
 - Dashboard: `scripts/dashboard.py` → http://127.0.0.1:8765/
 
@@ -87,5 +106,5 @@ prompts that add names/numbers from train/val items are rejected.
    follow reported facts that never quote anyone; link facts to quotes (fact → quote → speaker).
 5. **More data.** Other Quotebank years (2008–2019, ~185 GB); Reuters TRC2 (2008–09, NIST
    agreement) for true wire timestamps alongside Quotebank 2008–09.
-6. **Loop improvements.** Borderline second look (re-score +1/+2 candidates on all 145 train
-   items); self-generated harder benchmark items when train saturates; a GEPA comparison.
+6. **Loop improvements.** Self-generated harder benchmark items when train saturates; a GEPA
+   comparison. (Borderline second look: done.)
