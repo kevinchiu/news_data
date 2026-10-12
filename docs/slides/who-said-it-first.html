@@ -1,0 +1,787 @@
+<meta charset="utf-8">
+<title>Who Said It First?</title>
+<meta name="description" content="data.Flowers × Kevin Chiu (Plastachio), built at an RSIHOUSE × Sundai Club hack. Tracing a statement back to the article that reported it first, with a loop that improves the tracer and a locked test that keeps the score honest.">
+<script>document.documentElement.lang = 'en';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#FBF6EC; --paper-2:#F2EADA; --ink:#16150F; --ink-2:#5F5A4C; --rule:#B7AE9A;
+  --lime:#D6F21A; --on-lime:#16150F; --magenta:#C3137A; --stage:#E7DECB;
+  --sign:#16150F; --sign-ink:#F1EBDD; --sign-dim:#8E8775;
+  --serif:"DM Serif Display", Georgia, "Times New Roman", serif;
+  --sans:"Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#15140F; --paper-2:#1F1D16; --ink:#F1EBDD; --ink-2:#A8A08D; --rule:#4C473B;
+    --lime:#D6F21A; --on-lime:#16150F; --magenta:#FF5DB0; --stage:#0B0A07;
+    --sign:#0B0A07; --sign-ink:#F1EBDD; --sign-dim:#8E8775;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15140F; --paper-2:#1F1D16; --ink:#F1EBDD; --ink-2:#A8A08D; --rule:#4C473B;
+  --lime:#D6F21A; --on-lime:#16150F; --magenta:#FF5DB0; --stage:#0B0A07;
+  --sign:#0B0A07; --sign-ink:#F1EBDD; --sign-dim:#8E8775;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--stage);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ---------- stage & slides ---------- */
+.deck{position:fixed;inset:0 0 60px 0}
+.slide{
+  position:absolute;left:50%;top:50%;width:1600px;height:900px;margin:-450px 0 0 -800px;
+  transform:scale(var(--s,.5));background:var(--paper);color:var(--ink);
+  padding:64px 100px 52px;display:none;flex-direction:column;
+  box-shadow:0 30px 80px -40px rgba(0,0,0,.45);
+}
+.slide.is-active{display:flex}
+.s-head,.s-foot{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.s-head{padding-bottom:18px;border-bottom:2px dashed var(--rule)}
+.s-head .eyebrow{color:var(--magenta)}
+.s-foot{padding-top:16px;border-top:2px dashed var(--rule);font-size:13px}
+.brand{display:inline-flex;align-items:center;gap:12px}
+.mark{width:28px;height:28px;flex:none}
+.s-body{flex:1;min-height:0;padding:36px 0 28px;display:grid;gap:64px}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0;text-wrap:balance}
+h1{font-size:128px;line-height:.94;letter-spacing:-.015em}
+h2{font-size:62px;line-height:1.02;letter-spacing:-.01em}
+h3{font-size:32px;line-height:1.1}
+p{margin:0}
+.lede{font-size:28px;line-height:1.4;color:var(--ink-2);max-width:34ch;text-wrap:pretty}
+.label{font-family:var(--mono);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.mag{color:var(--magenta)}
+.hl{text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:.16em;
+  text-underline-offset:.04em;text-decoration-skip-ink:none}
+.serif-i{font-family:var(--serif);font-style:italic}
+.pull{font-family:var(--serif);font-size:32px;line-height:1.2;text-wrap:balance}
+.rule-top{padding-top:20px;border-top:2px dashed var(--rule)}
+
+/* bullet = the flower's centre: lime disc, ink ring */
+.points{list-style:none;margin:0;padding:0;display:grid;gap:20px}
+.points li{position:relative;padding-left:36px;font-size:24px;line-height:1.4;text-wrap:pretty}
+.points li::before{content:"";position:absolute;left:0;top:.42em;width:15px;height:15px;border-radius:50%;
+  background:var(--lime);box-shadow:0 0 0 2px var(--ink)}
+
+.defs{display:grid;gap:22px;margin:0}
+.defs div{display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;
+  padding-top:18px;border-top:2px dashed var(--rule)}
+.defs dt{font-family:var(--mono);font-size:16px;letter-spacing:.1em;text-transform:uppercase}
+.defs dd{margin:0;font-size:22px;line-height:1.4;color:var(--ink);text-wrap:pretty}
+.defs.compact{gap:16px}
+.defs.compact div{padding-top:14px}
+.defs.compact dd{font-size:21px}
+.defs.ask dd{font-family:var(--serif);font-style:italic;font-size:28px;line-height:1.2}
+
+/* columns with a label on top */
+.cols{display:grid;gap:48px}
+.cols p{font-size:22px;line-height:1.42;text-wrap:pretty}
+.cols .label{display:block;margin-bottom:10px}
+
+/* summary band */
+.band{display:grid;grid-template-columns:2fr 1fr;gap:64px;padding-top:22px;border-top:2px dashed var(--rule)}
+.band p{font-size:21px;line-height:1.42;text-wrap:pretty}
+.band .label{display:block;margin-bottom:8px}
+
+/* call to action: the one dark bar in the deck */
+.cta{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;padding:24px 32px;border-radius:8px;
+  background:var(--sign);color:var(--sign-ink)}
+.cta .label{color:var(--lime)}
+.cta p{font-size:28px;line-height:1.3;font-family:var(--serif)}
+.cta.four{grid-template-columns:auto repeat(4,1fr);align-items:start;gap:32px}
+.cta.four p{font-family:var(--sans);font-size:19px;line-height:1.4}
+.cta.four p b{display:block;font-family:var(--mono);font-weight:400;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--sign-dim);margin-bottom:6px}
+
+/* numbered problems */
+.probs{display:grid;gap:20px}
+.prob{display:grid;grid-template-columns:52px 1fr;gap:20px;align-items:start;padding-top:18px;border-top:2px dashed var(--rule)}
+.prob .n,.n-badge{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--paper);
+  box-shadow:0 0 0 2.5px var(--ink);font-family:var(--mono);font-size:18px}
+.prob h3{font-size:30px;margin-bottom:6px}
+.prob p{font-size:21px;line-height:1.4;text-wrap:pretty}
+
+/* ---------- diagrams ---------- */
+svg{display:block;overflow:visible}
+svg text{fill:var(--ink)}
+.lp-ring{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:10 9}
+.lp-arrow{fill:var(--ink)}
+.lp-node{fill:var(--paper);stroke:var(--ink);stroke-width:2.5}
+.lp-node.hot{fill:var(--lime)}
+.lp-label{font-family:var(--mono);font-size:26px;letter-spacing:.06em}
+.lp-center{font-family:var(--serif);font-style:italic;font-size:62px}
+.link{fill:none;stroke:var(--magenta);stroke-width:2.5}
+.link-head{fill:var(--magenta)}
+svg text.link-label{fill:var(--magenta);font-family:var(--mono);font-size:24px;letter-spacing:.06em}
+.arrow-head{fill:var(--ink)}
+.cyc-pill{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+.cyc-pill.first{fill:var(--lime)}
+svg text.cyc{font-family:var(--mono);font-size:15px;letter-spacing:.06em}
+svg text.cyc.on-lime{fill:var(--on-lime)}
+.cyc-wire{fill:none;stroke:var(--ink);stroke-width:2}
+.cyc-back{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:6 5}
+svg text.small{font-family:var(--mono);font-size:13px;letter-spacing:.08em;fill:var(--ink-2)}
+
+/* schematic region: same land, two states */
+.rg-land{fill:var(--paper-2);stroke:var(--ink);stroke-width:2.5}
+.town{fill:var(--lime);stroke:var(--ink);stroke-width:2.5}
+.town.hot{fill:var(--magenta)}
+.town.dark{fill:var(--paper);stroke:var(--ink-2);stroke-width:2;stroke-dasharray:3 3}
+.overflow{fill:none;stroke:var(--magenta);stroke-width:2.5;stroke-dasharray:6 5}
+.map-cap{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.map-cap .label{white-space:nowrap}
+.map-cap .note{font-size:17px;color:var(--ink-2)}
+
+/* nested rings */
+.ring{stroke:var(--ink);stroke-width:2.5}
+.ring.r4{fill:var(--paper-2)} .ring.r3{fill:var(--paper)} .ring.r2{fill:var(--paper-2)} .ring.r1{fill:var(--lime)}
+svg text.ring-label{font-family:var(--mono);font-size:17px;letter-spacing:.1em}
+svg text.ring-label.on-lime{fill:var(--on-lime)}
+
+/* who plans the trip: then / today / with the loop */
+.who{display:grid;gap:28px}
+.who-row{display:grid;grid-template-columns:180px 1fr;align-items:center}
+.chain{display:flex;align-items:center;flex-wrap:nowrap}
+.pill{padding:11px 22px;border:2.5px solid var(--ink);border-radius:999px;background:var(--paper);
+  font-family:var(--mono);font-size:18px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.pill.agent{background:var(--lime);color:var(--on-lime)}
+.pill.dark{background:var(--ink);color:var(--paper)}
+.wire{flex:0 0 44px;width:44px;min-width:44px;border-top:2.5px dashed var(--ink)}
+.chain .note{flex:none;margin-left:28px;font-family:var(--serif);font-style:italic;font-size:30px;color:var(--ink-2);white-space:nowrap}
+.chain .note.mag{color:var(--magenta)}
+.consequences{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;padding-top:22px;border-top:2px dashed var(--rule)}
+.consequences p{font-size:20px;line-height:1.4;text-wrap:pretty}
+
+/* ---------- tables ---------- */
+.matrix{display:grid;border-top:2px solid var(--ink)}
+.matrix > div{padding:13px 18px 13px 0;border-bottom:2px dashed var(--rule);font-size:20px;line-height:1.36;text-wrap:pretty}
+.matrix .ch{font-family:var(--mono);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);padding:14px 18px 12px 0;border-bottom:2px solid var(--ink)}
+.matrix .ex{font-family:var(--serif);font-size:28px;line-height:1.05}
+.matrix .metric{font-family:var(--mono);font-size:16px;line-height:1.45;color:var(--magenta)}
+
+/* ---------- pilot steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps::before{content:"";position:absolute;left:0;right:0;top:23px;border-top:2px dashed var(--rule)}
+.step{position:relative;padding-right:40px;display:grid;gap:12px;align-content:start}
+.step .n{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--paper);
+  box-shadow:0 0 0 2.5px var(--ink);font-family:var(--mono);font-size:19px;position:relative}
+.step.live .n{background:var(--lime);color:var(--on-lime)}
+.step p{font-size:21px;line-height:1.4;color:var(--ink)}
+.cycles{display:flex;gap:10px;flex-wrap:wrap}
+.cycles span{padding:4px 12px;border-radius:999px;background:var(--lime);color:var(--on-lime);font-family:var(--mono);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.criteria{display:grid;grid-template-columns:auto repeat(4,1fr);gap:36px;align-items:baseline;padding-top:20px;border-top:2px dashed var(--rule)}
+.criteria p{font-size:20px;line-height:1.4}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;left:0;right:0;bottom:0;height:60px;display:flex;align-items:center;justify-content:center;gap:22px;
+  font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+.nav button{font:inherit;color:var(--ink);background:transparent;border:2px solid var(--ink);border-radius:999px;
+  padding:7px 16px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
+.nav button:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:14px;position:relative;align-items:center}
+.dots::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed var(--rule)}
+.dots button{position:relative;width:14px;height:14px;padding:0;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+.dots button[aria-current="true"]{background:var(--lime);border-color:var(--ink)}
+.count{min-width:64px;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink)}
+.hint{color:var(--ink-2)}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--rule);text-decoration-thickness:2px;text-underline-offset:.18em}
+a:hover{text-decoration-color:var(--magenta)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--magenta);outline-offset:3px}
+.byline{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;padding-top:22px;border-top:2px dashed var(--rule);font-size:24px;line-height:1.4}
+.byline .who-name{font-family:var(--serif);font-size:34px}
+@media (max-width:640px){.hint{display:none}.dots{gap:8px}}
+
+@media print{
+  @page{size:1600px 900px;margin:0}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{height:auto}
+  body{overflow:visible;background:var(--paper)}
+  .deck{position:static}
+  .slide{display:flex !important;position:relative;left:auto;top:auto;margin:0;transform:none;box-shadow:none;break-after:page;overflow:hidden}
+  .slide:last-child{break-after:auto}
+  .nav{display:none}
+}
+
+/* ---------- this deck ---------- */
+/* how a quote drifts, and tracing back */
+.drift{display:grid;gap:22px}
+.dir{display:flex;align-items:center;gap:18px}
+.dir .label{white-space:nowrap}
+.arrow{flex:1;height:0;border-top:2.5px solid var(--magenta);position:relative}
+.arrow::after{content:"";position:absolute;right:-2px;top:-8.25px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent var(--magenta)}
+.arrow.back{border-top-color:var(--ink)}
+.arrow.back::after{right:auto;left:-2px;border-width:7px 12px 7px 0;border-color:transparent var(--ink) transparent transparent}
+.drift-steps{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+.drift-steps::before{content:"";position:absolute;left:0;right:0;top:15px;border-top:2.5px dashed var(--ink)}
+.dstep{position:relative;display:grid;gap:10px;align-content:start;padding-right:32px}
+.dstep .dot{width:32px;height:32px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink);position:relative}
+.dstep.src .dot{background:var(--lime)}
+.dstep.bad .dot{background:var(--magenta)}
+.dstep p{font-size:21px;line-height:1.38;text-wrap:pretty}
+.cols .q-big{font-family:var(--serif);font-size:30px;line-height:1.15;text-wrap:balance}
+
+/* two sources */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.split > div{display:grid;gap:18px;align-content:start}
+.split > div + div{padding-left:56px;margin-left:0;border-left:2px dashed var(--rule)}
+.split > div:first-child{padding-right:56px}
+.family{display:grid;gap:12px}
+.fv{display:grid;grid-template-columns:90px 64px 1fr;gap:14px;align-items:baseline}
+.fv .bar{height:14px;background:var(--ink);border-radius:2px;align-self:center}
+.fv .n{font-family:var(--mono);font-size:15px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.fv .q{font-family:var(--serif);font-size:22px;line-height:1.2}
+.stats{display:grid;grid-template-columns:repeat(4,auto);gap:16px 28px}
+.stat{padding-top:12px;border-top:2px dashed var(--rule);display:grid;gap:4px}
+.stat b{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1}
+.stat span{font-size:17px;color:var(--ink-2)}
+.src-p{font-size:21px;line-height:1.42;text-wrap:pretty}
+.cite{font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--ink-2)}
+
+/* grouping: word tiles */
+.tiles{display:grid;gap:16px}
+.trow{display:grid;grid-template-columns:130px auto 1fr;gap:16px;align-items:center}
+.tword{display:flex;gap:4px}
+.tword i{width:25px;height:25px;border-radius:5px;background:var(--paper);box-shadow:inset 0 0 0 2px var(--ink)}
+.tword i.m{background:var(--lime);box-shadow:inset 0 0 0 2px var(--ink)}
+.tword i.x{background:transparent;box-shadow:none;outline:2px dashed var(--ink-2);outline-offset:-2px}
+.tword i.e{background:transparent;box-shadow:none}
+.verdict{font-family:var(--serif);font-style:italic;font-size:26px;white-space:nowrap}
+.legend{display:flex;gap:28px;align-items:center;font-size:18px;color:var(--ink-2)}
+.legend i{display:inline-block;width:20px;height:20px;border-radius:4px;vertical-align:-4px;margin-right:8px}
+.legend i.m{background:var(--lime);box-shadow:inset 0 0 0 2px var(--ink)}
+.legend i.x{outline:2px dashed var(--ink-2);outline-offset:-2px}
+.big-n{font-family:var(--serif);font-size:84px;line-height:.95}
+
+/* tracing steps */
+.steps.three{grid-template-columns:repeat(3,1fr)}
+.step .clue{font-family:var(--mono);font-size:15px;line-height:1.45;letter-spacing:.04em;color:var(--magenta)}
+
+/* improvement loop */
+.loop.big .lp-label{font-size:31px}
+.sets{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:20px}
+.set{padding:16px 22px;border:2.5px solid var(--ink);border-radius:8px;display:grid;gap:6px;align-content:start}
+.set p{font-size:19px;line-height:1.38;text-wrap:pretty}
+.set.two{background:var(--paper-2)}
+.set.lock{background:var(--sign);color:var(--sign-ink);border-color:var(--sign)}
+.set.lock .label{color:var(--lime)}
+
+/* speakers, small word tiles */
+.dquote{display:flex;align-items:center;gap:10px}
+.spk{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 2px var(--ink);font-family:var(--mono);font-size:13px;font-weight:500;flex:none}
+.spk.b{background:var(--magenta);color:#fff}
+.tword.sm{gap:3px}
+.tword.sm i{width:17px;height:17px;border-radius:3px}
+.legend i.dot{border-radius:50%;background:var(--ink)}
+.legend i.hollow{border-radius:50%;background:var(--paper);outline:2px dashed var(--ink-2);outline-offset:-2px}
+.legend i.first{border-radius:50%;background:var(--lime);box-shadow:inset 0 0 0 2px var(--ink)}
+svg.mini{width:100%;max-width:400px;height:auto}
+
+/* staircase: words to ideas */
+.stairs{display:grid;gap:8px}
+.st{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 18px;border:2.5px dashed var(--ink-2);border-radius:8px;background:var(--paper)}
+.st b{font-family:var(--serif);font-weight:400;font-size:25px;line-height:1.1}
+.st span{font-family:var(--mono);font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.st.now{border:2.5px solid var(--ink);background:var(--lime);color:var(--on-lime)}
+.st.now span{color:var(--on-lime)}
+
+/* results inside the set cards */
+.res{display:grid;grid-template-columns:44px 1fr 46px;gap:5px 10px;align-items:center;margin-top:4px}
+.res .k{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.res .track{height:13px;border-radius:2px;background:var(--paper-2);box-shadow:inset 0 0 0 1.5px var(--rule);position:relative;overflow:hidden}
+.set.two .res .track{background:var(--paper)}
+.res .fill{position:absolute;left:0;top:0;bottom:0;background:var(--ink-2)}
+.res .fill.now{background:var(--lime);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.res b{font-family:var(--mono);font-weight:500;font-size:15px;text-align:right;font-variant-numeric:tabular-nums}
+.res .pending{grid-column:2 / 4;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
+.set.lock .res .k{color:var(--sign-dim)}
+.set.lock .res .track{background:rgba(255,255,255,.08);box-shadow:none}
+.set.lock .res .fill{background:var(--sign-dim)}
+
+/* uses and next steps */
+.nexts{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:nx}
+.nexts li{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;padding-top:9px;border-top:2px dashed var(--rule);font-size:21px;line-height:1.4;counter-increment:nx}
+.nexts li::before{content:counter(nx);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink);font-family:var(--mono);font-size:17px}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<radialGradient id="df-flower-core" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(89.4993 88.8382) rotate(90) scale(47.4727 48.2976)">
+<stop stop-color="#F5C431"/>
+<stop offset="1" stop-color="#E9AA18"/>
+</radialGradient>
+</defs>
+<symbol id="df-flower" viewBox="0 0 179 179">
+<g fill="none">
+<path d="M111.625 86.4189C96.875 91.372 96.875 96.3251 111.625 101.278C126.375 106.231 137.437 109.946 144.813 112.423C152.188 114.899 159.562 112.423 166.937 104.993C174.312 97.5634 178 88.8954 178 78.9892C178 69.083 174.312 65.3681 166.937 67.8447C159.562 70.3212 152.188 72.7978 144.813 75.2743C137.437 77.7509 126.375 81.4657 111.625 86.4189Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M89.4995 69.8062C89.4995 85.8349 84.9417 87.3656 75.8256 74.3981C66.7096 61.4307 59.8724 51.705 55.3145 45.2213C50.7565 38.7376 50.7565 30.7233 55.3145 21.1784C59.8724 11.6336 66.7096 5.33045 75.8256 2.26922C84.9417 -0.791971 89.4995 1.68455 89.4995 9.69889C89.4995 17.7132 89.4995 25.7276 89.4995 33.7419C89.4995 41.7562 89.4995 53.7776 89.4995 69.8062Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M89.499 69.8062C89.499 85.8349 94.0571 87.3656 103.173 74.3981C112.289 61.4307 119.126 51.705 123.684 45.2213C128.242 38.7376 128.242 30.7233 123.684 21.1784C119.126 11.6336 112.289 5.33045 103.173 2.26922C94.0571 -0.791971 89.499 1.68455 89.499 9.69889C89.499 17.7132 89.499 25.7276 89.499 33.7419C89.499 41.7562 89.499 53.7776 89.499 69.8062Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M111.624 86.4198C96.8737 91.3729 94.0567 87.3658 103.173 74.3984C112.289 61.4309 119.126 51.7052 123.684 45.2216C128.242 38.7378 135.617 36.2612 145.809 37.7919C156.001 39.3224 163.914 44.095 169.548 52.1093C175.182 60.1237 174.311 65.369 166.936 67.8456C159.561 70.3221 152.186 72.7987 144.811 75.2752C137.436 77.7518 126.374 81.4667 111.624 86.4198Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M103.173 113.299C94.0567 100.332 96.8737 96.3247 111.624 101.278C126.374 106.231 137.436 109.946 144.811 112.422C152.186 114.899 156.744 121.383 158.485 131.874C160.226 142.364 158.28 151.617 152.646 159.631C147.012 167.646 141.915 168.411 137.358 161.927C132.8 155.443 128.242 148.96 123.684 142.476C119.126 135.993 112.289 126.267 103.173 113.299Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M103.173 113.301C94.0571 100.334 89.499 101.864 89.499 117.893C89.499 133.921 89.499 145.943 89.499 153.957C89.499 161.971 94.0571 168.455 103.173 173.408C112.289 178.361 121.405 179.307 130.521 176.246C139.637 173.185 141.916 168.413 137.358 161.929C132.8 155.445 128.242 148.962 123.684 142.478C119.126 135.994 112.289 126.268 103.173 113.301Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M75.8264 113.301C84.9425 100.334 89.5003 101.864 89.5003 117.893C89.5003 133.921 89.5003 145.943 89.5003 153.957C89.5003 161.971 84.9425 168.455 75.8264 173.408C66.7105 178.361 57.5942 179.307 48.4783 176.246C39.3622 173.185 37.0833 168.413 41.6414 161.929C46.1992 155.445 50.7573 148.962 55.3153 142.478C59.8733 135.994 66.7105 126.268 75.8264 113.301Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M75.8265 113.299C84.9426 100.332 82.1254 96.3247 67.3754 101.278C52.6255 106.231 41.5627 109.946 34.188 112.422C26.813 114.899 22.255 121.383 20.5139 131.874C18.773 142.364 20.7193 151.617 26.3534 159.631C31.9873 167.646 37.0833 168.411 41.6415 161.927C46.1993 155.443 50.7574 148.96 55.3154 142.476C59.8733 135.993 66.7105 126.267 75.8265 113.299Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M67.3749 86.4189C82.1248 91.372 82.1248 96.3251 67.3749 101.278C52.625 106.231 41.5622 109.946 34.1875 112.423C26.8125 114.899 19.4374 112.423 12.0624 104.993C4.6874 97.5634 1 88.8954 1 78.9892C1 69.083 4.6874 65.3681 12.0624 67.8447C19.4374 70.3212 26.8125 72.7978 34.1875 75.2743C41.5622 77.7509 52.625 81.4657 67.3749 86.4189Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M67.375 86.4198C82.125 91.3729 84.9422 87.3658 75.8261 74.3984C66.7101 61.4309 59.8729 51.7052 55.315 45.2216C50.757 38.7378 43.382 36.2612 33.1901 37.7919C22.9979 39.3224 15.085 44.095 9.45096 52.1093C3.81705 60.1237 4.68751 65.369 12.0625 67.8456C19.4376 70.3221 26.8126 72.7987 34.1876 75.2752C41.5623 77.7518 52.6251 81.4667 67.375 86.4198Z" fill="#F6E681" stroke="#5F6D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M75.8254 74.3989C72.3048 69.3929 68.6077 68.1414 64.734 70.6443C60.8602 73.1473 56.6445 75.164 52.0863 76.6947C47.5285 78.2252 43.9001 78.5375 41.2017 77.6314C43.9001 78.5375 46.6578 80.9941 49.4748 85.0013C52.2918 89.0084 54.5554 93.201 56.2658 97.5793C57.9762 101.958 61.6792 103.191 67.3744 101.28C61.68 103.193 59.3858 106.44 60.4919 111.021C61.5981 115.602 62.1513 120.369 62.1513 125.323C62.1513 130.276 61.3175 133.938 59.6496 136.311C61.3175 133.938 64.4304 131.987 68.9884 130.456C73.5464 128.926 78.104 127.996 82.6615 127.668C87.2189 127.34 89.4981 124.082 89.4993 117.893C89.5004 124.082 91.7798 127.34 96.3371 127.668C100.895 127.996 105.452 128.926 110.01 130.456C114.568 131.987 117.681 133.938 119.349 136.311C117.681 133.938 116.847 130.276 116.847 125.323C116.847 120.369 117.4 115.602 118.507 111.021C119.613 106.44 117.319 103.193 111.624 101.28C117.319 103.191 121.022 101.958 122.733 97.5793C124.443 93.201 126.707 89.0084 129.524 85.0013C132.341 80.9941 135.099 78.5375 137.797 77.6314C135.099 78.5375 131.47 78.2252 126.912 76.6947C122.354 75.164 118.138 73.1473 114.265 70.6443C110.391 68.1414 106.694 69.3929 103.173 74.3989C106.692 69.3913 106.701 65.3706 103.201 62.3367C99.7005 59.3026 96.5418 55.7819 93.7248 51.7749C90.908 47.7676 89.4993 44.2979 89.4993 41.3655C89.4993 44.2979 88.091 47.7676 85.2737 51.7749C82.4568 55.7819 79.2981 59.3026 75.7977 62.3367C72.2972 65.3706 72.3067 69.3913 75.8254 74.3989Z" fill="url(#df-flower-core)"/>
+<path d="M75.8254 74.3988C72.3048 69.3929 68.6077 68.1414 64.734 70.6443C60.8602 73.1473 56.6445 75.164 52.0863 76.6947C47.5285 78.2252 43.9001 78.5375 41.2017 77.6314C43.9001 78.5375 46.6578 80.9941 49.4748 85.0013C52.2918 89.0084 54.5554 93.201 56.2658 97.5793C57.9762 101.958 61.6792 103.191 67.3744 101.28C61.68 103.193 59.3858 106.44 60.4919 111.021C61.5981 115.602 62.1513 120.369 62.1513 125.323C62.1513 130.276 61.3175 133.938 59.6496 136.311C61.3175 133.938 64.4304 131.987 68.9884 130.456C73.5464 128.926 78.104 127.996 82.6615 127.668C87.2189 127.34 89.4981 124.082 89.4993 117.893C89.5004 124.082 91.7798 127.34 96.3371 127.668C100.895 127.996 105.452 128.926 110.01 130.456C114.568 131.987 117.681 133.938 119.349 136.311C117.681 133.938 116.847 130.276 116.847 125.323C116.847 120.369 117.4 115.602 118.507 111.021C119.613 106.44 117.319 103.193 111.624 101.28C117.319 103.191 121.022 101.958 122.733 97.5793C124.443 93.201 126.707 89.0084 129.524 85.0013C132.341 80.9941 135.099 78.5375 137.797 77.6314C135.099 78.5375 131.47 78.2252 126.912 76.6947C122.354 75.164 118.138 73.1473 114.265 70.6443C110.391 68.1414 106.694 69.3929 103.173 74.3988C106.692 69.3913 106.701 65.3706 103.201 62.3367C99.7005 59.3026 96.5418 55.7819 93.7248 51.7749C90.908 47.7676 89.4993 44.2979 89.4993 41.3655C89.4993 44.2979 88.091 47.7676 85.2737 51.7749C82.4568 55.7819 79.2981 59.3026 75.7977 62.3367C72.2972 65.3706 72.3067 69.3913 75.8254 74.3988Z" stroke="#6E4F1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M74.4152 93.8562C74.4156 97.1194 72.0692 99.5948 67.376 101.283C67.3763 101.283 67.3764 101.284 67.3767 101.285C67.377 101.286 67.3774 101.287 67.3775 101.288C67.3779 101.289 67.3781 101.29 67.3785 101.291C67.3787 101.291 67.3792 101.293 67.3792 101.293C72.1356 99.8065 75.442 100.383 77.2983 103.023C79.2199 105.755 81.735 107.643 84.8439 108.687C87.8453 109.695 89.3982 112.763 89.5026 117.892H89.5045H89.5065H89.5084H89.5103C89.614 112.763 91.1665 109.694 94.1678 108.687C97.2766 107.643 99.7916 105.754 101.713 103.021C103.568 100.383 106.871 99.8049 111.622 101.288C111.622 101.287 111.623 101.286 111.623 101.285C111.623 101.284 111.623 101.283 111.624 101.282C111.624 101.281 111.625 101.28 111.625 101.279C111.625 101.279 111.625 101.278 111.626 101.277C106.938 99.5894 104.595 97.1155 104.595 93.8544C104.595 90.4761 103.634 87.4205 101.713 84.6875C99.8579 82.0481 100.348 78.6209 103.184 74.4062C103.183 74.4055 103.183 74.4051 103.182 74.4044C103.181 74.4039 103.18 74.4031 103.18 74.4026C103.179 74.4022 103.178 74.4014 103.177 74.401C103.177 74.4004 103.176 74.3998 103.175 74.3992C100.173 78.489 97.1704 80.03 94.1682 79.0219C91.0594 77.978 87.9508 77.978 84.842 79.0219C81.8385 80.0306 78.835 78.488 75.8314 74.394C75.8304 74.3948 75.8295 74.3954 75.8287 74.3962C75.8277 74.3969 75.827 74.3976 75.8259 74.3982C75.825 74.399 75.8239 74.3996 75.8232 74.4004C75.8221 74.401 75.8213 74.4019 75.8203 74.4024C78.66 78.6194 79.1517 82.0481 77.2958 84.6889C75.375 87.4221 74.4147 90.478 74.4152 93.8562Z" fill="#6E4F1B"/>
+<path d="M74.4152 93.8562C74.4156 97.1194 72.0692 99.5948 67.376 101.283C67.3763 101.283 67.3764 101.284 67.3767 101.285C67.377 101.286 67.3774 101.287 67.3775 101.288C67.3779 101.289 67.3781 101.29 67.3785 101.291C67.3787 101.291 67.3792 101.293 67.3792 101.293C72.1356 99.8065 75.442 100.383 77.2983 103.023C79.2199 105.755 81.735 107.643 84.8439 108.687C87.8453 109.695 89.3982 112.763 89.5026 117.892H89.5045H89.5065H89.5084H89.5103C89.614 112.763 91.1665 109.694 94.1678 108.687C97.2766 107.643 99.7916 105.754 101.713 103.021C103.568 100.383 106.871 99.8049 111.622 101.288C111.622 101.287 111.623 101.286 111.623 101.285C111.623 101.284 111.623 101.283 111.624 101.282C111.624 101.281 111.625 101.28 111.625 101.279C111.625 101.279 111.625 101.278 111.626 101.277C106.938 99.5894 104.595 97.1155 104.595 93.8544C104.595 90.4761 103.634 87.4205 101.713 84.6875C99.8579 82.0481 100.348 78.6209 103.184 74.4062C103.183 74.4055 103.183 74.4051 103.182 74.4044C103.181 74.4039 103.18 74.4031 103.18 74.4026C103.179 74.4022 103.178 74.4014 103.177 74.401C103.177 74.4004 103.176 74.3998 103.175 74.3992C100.173 78.489 97.1704 80.03 94.1682 79.0219C91.0594 77.978 87.9508 77.978 84.842 79.0219C81.8385 80.0306 78.835 78.488 75.8314 74.394C75.8304 74.3948 75.8295 74.3954 75.8287 74.3962C75.8277 74.3969 75.827 74.3976 75.8259 74.3982C75.825 74.399 75.8239 74.3996 75.8232 74.4004C75.8221 74.401 75.8213 74.4019 75.8203 74.4024C78.66 78.6194 79.1517 82.0481 77.2958 84.6889C75.375 87.4221 74.4147 90.478 74.4152 93.8562Z" stroke="#6E4F1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M95.8529 93.8496C95.8529 90.247 92.9846 87.2827 89.4989 87.2827C86.0131 87.2827 83.145 90.247 83.145 93.8496C83.145 97.4521 86.0131 100.417 89.4989 100.417C92.9846 100.417 95.8529 97.4521 95.8529 93.8496Z" fill="#FFF4B0" stroke="#6E4F1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</symbol>
+</svg>
+
+<main class="deck" id="deck" aria-roledescription="presentation">
+
+<!-- 0 · Cover -->
+<section class="slide" aria-label="Title">
+  <header class="s-head"><span class="eyebrow">Hack project · RSIHOUSE × Sundai Club</span><span><a href="https://data.flowers" target="_blank" rel="noopener">data.Flowers</a> × <a href="https://www.linkedin.com/company/plastachio/" target="_blank" rel="noopener">Plastachio</a> · October 2026</span></header>
+  <div class="s-body" style="grid-template-columns:1fr 360px;align-items:center">
+    <div style="display:grid;gap:40px">
+      <h1 style="font-size:132px">Who said it <span class="serif-i hl">first?</span></h1>
+      <p class="lede" style="max-width:40ch">Tracing a statement back to the article that reported it first, with a loop that makes the tracer better on its own.</p>
+      <p class="byline"><span class="label">Prepared by</span><a class="who-name" href="https://jakul.in" target="_blank" rel="noopener">Dr. Aleks Jakulin</a><span><a href="https://data.flowers" target="_blank" rel="noopener">data.Flowers</a></span><span class="label" style="margin-left:12px">with</span><a class="who-name" href="https://kevinchiu.org/" target="_blank" rel="noopener">Kevin Chiu</a><span><a href="https://www.linkedin.com/company/plastachio/" target="_blank" rel="noopener">Plastachio</a></span></p>
+      <p class="label" style="margin-top:-24px">Built at an <a href="https://rsihouse.ai" target="_blank" rel="noopener">RSIHOUSE</a> × <a href="https://www.sundai.club/" target="_blank" rel="noopener">Sundai Club</a> hack</p>
+    </div>
+    <svg viewBox="0 0 360 640" width="360" height="640" role="img" aria-label="data.Flowers logo above a family tree of quote versions, traced up to the first report">
+      <use href="#df-flower" x="20" y="0" width="320" height="320"/>
+      <line x1="180" y1="330" x2="180" y2="400" style="stroke:var(--ink);stroke-width:2.5;stroke-dasharray:8 8"/>
+      <g style="stroke:var(--ink);stroke-width:2.5">
+        <line x1="180" y1="428" x2="90" y2="520"/><line x1="180" y1="428" x2="180" y2="520"/><line x1="180" y1="428" x2="270" y2="520"/>
+        <line x1="90" y1="520" x2="50" y2="605"/><line x1="90" y1="520" x2="130" y2="605"/><line x1="180" y1="520" x2="180" y2="605"/>
+        <line x1="270" y1="520" x2="230" y2="605"/><line x1="270" y1="520" x2="310" y2="605"/>
+      </g>
+      <circle cx="180" cy="428" r="26" style="fill:var(--lime);stroke:var(--ink);stroke-width:2.5"/>
+      <g style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5">
+        <circle cx="90" cy="520" r="15"/><circle cx="180" cy="520" r="15"/><circle cx="270" cy="520" r="15"/>
+      </g>
+      <g style="fill:var(--paper);stroke:var(--ink-2);stroke-width:2;stroke-dasharray:3 3">
+        <circle cx="50" cy="605" r="10"/><circle cx="130" cy="605" r="10"/><circle cx="180" cy="605" r="10"/><circle cx="230" cy="605" r="10"/><circle cx="310" cy="605" r="10"/>
+      </g>
+      <text x="218" y="433" class="small">FIRST REPORT</text>
+    </svg>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Who said it first?</span><span class="num"></span></footer>
+</section>
+
+<!-- 1 · Summary -->
+<section class="slide" aria-label="Summary">
+  <header class="s-head"><span class="eyebrow">Summary</span><span>The project on one page</span></header>
+  <div class="s-body" style="grid-template-rows:auto auto 1fr auto;gap:36px">
+    <h2 style="max-width:32ch">We trace a statement back to the article that reported it <span class="serif-i hl">first</span></h2>
+    <div class="chain" role="img" aria-label="A statement goes in, the tracer shortlists 30 quotes and reads them, and the first report comes out: website, date and time.">
+      <span class="pill">“X said that…”</span><span class="wire"></span><span class="pill">Shortlist 30</span><span class="wire"></span><span class="pill">Read</span><span class="wire"></span><span class="pill agent">First report</span><span class="note">website · date · time</span>
+    </div>
+    <div class="cols rule-top" style="grid-template-columns:repeat(3,1fr);align-content:start">
+      <p><span class="label mag">The problem</span>Our model of reality is built from retold text. Quotes get trimmed, reworded and credited to the wrong person, and AI models learn the drifted version.</p>
+      <p><span class="label">What we built</span>A tracer over four months of news: about 4 million articles, January to April 2020. Give it “X said that…”; it finds the quotes that say it and the earliest article that carried them.</p>
+      <p><span class="label">How it improves</span>A stronger AI model studies the tracer's mistakes and suggests small fixes. Three fixes passed, and on questions it never studied, correct first reports rose from 60% to 86%.</p>
+    </div>
+    <div class="cta"><span class="label">Where it leads</span><p>News is the simple case. Next: the origins of ideas and inventions, as long as they are shared in the open.</p></div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Who said it first?</span><span class="num"></span></footer>
+</section>
+
+<!-- 2 · Problem and subproblem -->
+<section class="slide" aria-label="The problem">
+  <header class="s-head"><span class="eyebrow">The problem</span><span>From reality to retelling</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr auto;gap:28px">
+    <h2 style="font-size:58px">Our model of reality drifts, one retold quote at a <span class="serif-i hl">time</span></h2>
+    <div class="drift" style="align-self:center" role="img" aria-label="How a quote drifts: said, reported, trimmed, reworded, reattributed. Tracing runs the other way, back to the source.">
+      <div class="dir"><span class="label mag">How a quote drifts</span><span class="arrow"></span></div>
+      <div class="drift-steps">
+        <div class="dstep src"><span class="dot"></span><span class="label">Said</span><span class="dquote"><b class="spk">A</b><span class="tword sm" data-w="oooooooooo"></span></span><p>Someone says the words, once, at one moment.</p></div>
+        <div class="dstep"><span class="dot"></span><span class="label">Reported</span><span class="dquote"><b class="spk">A</b><span class="tword sm" data-w="mmmmmmmmmm"></span></span><p>The first article carries them, with a time stamp.</p></div>
+        <div class="dstep"><span class="dot"></span><span class="label">Trimmed</span><span class="dquote"><b class="spk">A</b><span class="tword sm" data-w="mmmmmm"></span></span><p>Other outlets cut the quote to fit.</p></div>
+        <div class="dstep"><span class="dot"></span><span class="label">Reworded</span><span class="dquote"><b class="spk">A</b><span class="tword sm" data-w="mmmxxmm"></span></span><p>Posts and summaries paraphrase it.</p></div>
+        <div class="dstep bad"><span class="dot"></span><span class="label mag">Reattributed</span><span class="dquote"><b class="spk b">B</b><span class="tword sm" data-w="mmmxxmm"></span></span><p>A better-known name gets the credit, and AI models learn that version.</p></div>
+      </div>
+      <div class="dir"><span class="arrow back"></span><span class="label">Tracing runs back to the source</span></div>
+    </div>
+    <div class="cols rule-top" style="grid-template-columns:1fr 1fr 1.1fr;gap:56px">
+      <div><span class="label mag">The problem</span><p class="q-big">How do we keep our model of reality aligned with reality itself?</p></div>
+      <div><span class="label">The subproblem</span><p class="q-big">Identify a quote, track it through time, and find its source.</p></div>
+      <p style="font-size:20px"><span class="label">Why now</span>Kevin Chiu gave eleven AI models from different labs the same simple puzzle. All of them chose the same wrong answer, most likely because they learned from the same text.</p>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><span>data.Flowers × Plastachio · Who said it first? · Tiles are words; A and B are speakers · Kevin Chiu, <a href="https://kevinchiu.org/posts/1755636469288-something-strange-with-llms/" target="_blank" rel="noopener">“Something Strange with LLMs”</a>, 2025</span></span><span class="num"></span></footer>
+</section>
+
+<!-- 3 · Inspiration and data -->
+<section class="slide" aria-label="Inspiration and data">
+  <header class="s-head"><span class="eyebrow">Inspiration · Data</span><span>What we build on</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr;gap:28px">
+    <h2 style="font-size:54px">MemeTracker showed how quotes travel; Quotebank tells us who <span class="serif-i hl">said</span> them</h2>
+    <div class="split">
+      <div>
+        <span class="label mag">Inspiration · MemeTracker, 2009</span>
+        <h3>Quotes travel in families, and the shortest version travels furthest</h3>
+        <div class="family" role="img" aria-label="Five of 61 versions of one quote, with mentions: lipstick on a pig, 11,235; you can put lipstick on a pig, 1,051; you can put lipstick on a pig but it's still a pig, 967; i think they put some lipstick on a pig but it's still a pig, 604; putting lipstick on a pig, 542.">
+          <div class="fv"><span class="bar" style="width:100%"></span><span class="n">11,235</span><span class="q">“<span class="hl">lipstick on a pig</span>”</span></div>
+          <div class="fv"><span class="bar" style="width:9.4%"></span><span class="n">1,051</span><span class="q">“you can put <span class="hl">lipstick on a pig</span>”</span></div>
+          <div class="fv"><span class="bar" style="width:8.6%"></span><span class="n">967</span><span class="q">“you can put <span class="hl">lipstick on a pig</span> but it's still a pig”</span></div>
+          <div class="fv"><span class="bar" style="width:5.4%"></span><span class="n">604</span><span class="q">“i think they put some <span class="hl">lipstick on a pig</span> but it's still a pig”</span></div>
+          <div class="fv"><span class="bar" style="width:4.8%"></span><span class="n">542</span><span class="q">“putting <span class="hl">lipstick on a pig</span>”</span></div>
+        </div>
+        <p class="src-p">5 of 61 versions in one family, with mentions. The study grouped 90 million articles from 1.6 million news sites and blogs into such families. News outlets peaked about 2.5 hours before blogs.</p>
+      </div>
+      <div>
+        <span class="label mag">Data · Quotebank, 2021</span>
+        <h3>178 million quotes, each with its likely speaker</h3>
+        <div class="stats">
+          <div class="stat"><b>178M</b><span>unique quotes</span></div>
+          <div class="stat"><b>162M</b><span>news articles</span></div>
+          <div class="stat"><b>2008–20</b><span>twelve years</span></div>
+          <div class="stat"><b>377k</b><span>websites</span></div>
+        </div>
+        <p class="src-p">Speakers are linked to Wikidata. In the authors' test, 86.9% of quotes went to the right speaker. Open data (CC BY 4.0); the public release is larger still, at 235M quotes.</p>
+        <div class="rule-top" style="display:grid;gap:8px">
+          <svg viewBox="0 0 588 92" width="560" height="88" role="img" aria-label="Timeline 2008 to 2020. MemeTracker data: August 2008 to April 2009. Quotebank: August 2008 to April 2020. Our slice: January to April 2020.">
+            <rect x="34" y="6" width="32" height="10" style="fill:var(--magenta)"/>
+            <text x="74" y="15" class="small" style="fill:var(--magenta)">MEMETRACKER</text>
+            <rect x="34" y="28" width="494" height="16" rx="2" style="fill:var(--paper-2);stroke:var(--ink);stroke-width:2"/>
+            <text x="250" y="40.5" text-anchor="middle" class="small" style="fill:var(--ink)">QUOTEBANK · 2008–2020</text>
+            <rect x="514" y="22" width="14" height="28" rx="2" style="fill:var(--lime);stroke:var(--ink);stroke-width:2.5"/>
+            <text x="506" y="15" text-anchor="end" class="small" style="fill:var(--ink)">OUR SLICE</text>
+            <path d="M521,17 L521,21" style="stroke:var(--ink);stroke-width:2"/>
+            <line x1="10" y1="62" x2="560" y2="62" style="stroke:var(--ink);stroke-width:2"/>
+            <g class="tl-ticks"></g>
+          </svg>
+          <p class="pull" style="font-size:26px">January–April 2020: about <span class="hl">4 million articles</span>, small enough to iterate on in a day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><span>Leskovec, Backstrom &amp; Kleinberg, <a href="https://snap.stanford.edu/memetracker/" target="_blank" rel="noopener">KDD 2009</a> · Vaucher, Spitz, Catasta &amp; West, <a href="https://dl.acm.org/doi/10.1145/3437963.3441760" target="_blank" rel="noopener">WSDM 2021</a></span></span><span class="num"></span></footer>
+</section>
+
+<!-- 4 · Library and grouping -->
+<section class="slide" aria-label="The library">
+  <header class="s-head"><span class="eyebrow">How it works · 1</span><span>The library</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr auto;gap:28px">
+    <h2 style="font-size:56px">For every quote we know who probably said it, where it ran and exactly <span class="serif-i hl">when</span></h2>
+    <div style="display:grid;grid-template-columns:500px 1fr;gap:64px;align-items:start">
+      <div style="display:grid;gap:16px">
+        <span class="label mag">The library · January–April 2020</span>
+        <p><span class="big-n">≈4M</span><span style="font-size:24px;color:var(--ink-2);margin-left:14px">news articles</span></p>
+        <p class="cite" style="font-size:14px;margin-top:-8px">5.2M QUOTES · 16.7M MENTIONS WITH TIME, OUTLET, URL</p>
+        <svg viewBox="0 0 600 340" width="500" height="283" role="img" aria-label="One quote in the library: its probable speaker, its words, and every article that carried it, by website and time. The earliest article with a precise time is the first report; some articles carry only a date.">
+          <text x="0" y="14" class="small">PROBABLE SPEAKER</text><text x="170" y="14" class="small">THE QUOTE</text>
+          <circle cx="22" cy="50" r="20" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+          <text x="22" y="55.5" text-anchor="middle" style="font-family:var(--mono);font-size:16px">A</text>
+          <g class="lib-words"></g>
+          <text x="0" y="112" class="small">WEBSITE</text><text x="110" y="112" class="small">EVERY ARTICLE THAT CARRIED IT</text>
+          <g class="lib-rows"></g>
+        </svg>
+        <div class="legend"><span><i class="dot"></i>precise time</span><span><i class="hollow"></i>date only</span><span><i class="first"></i>first report</span></div>
+      </div>
+      <div style="display:grid;gap:22px">
+        <span class="label mag">Grouping versions of the same quote</span>
+        <p style="font-size:22px;line-height:1.42;text-wrap:pretty">Outlets trim quotes or reword them slightly. If two quotes share <strong>long runs of identical words</strong> (eight or more in a row), we treat them as versions of one quote, so a shortened version still counts.</p>
+        <div class="tiles" role="img" aria-label="Word tiles. A trimmed quote shares one long run of words with the original: same quote. A reworded quote shares two long runs: same quote. A quote on the same topic shares only scattered single words: a different quote.">
+          <div class="trow"><span class="label">Original</span><span class="tword" data-w="oooooooooooooooo"></span><span></span></div>
+          <div class="trow"><span class="label">Trimmed</span><span class="tword" data-w="eeeemmmmmmmmmmee"></span><span class="verdict">same quote</span></div>
+          <div class="trow"><span class="label">Reworded</span><span class="tword" data-w="mmmmmmxxxmmmmmmm"></span><span class="verdict">same quote</span></div>
+          <div class="trow"><span class="label">Same topic</span><span class="tword" data-w="xxmxxxxmxxxmxxxx"></span><span class="verdict mag">different quote</span></div>
+        </div>
+        <div class="legend"><span><i class="m"></i>same word as the original</span><span><i class="x"></i>different word</span></div>
+      </div>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Who said it first? · Each tile is one word</span><span class="num"></span></footer>
+</section>
+
+<!-- 5 · Tracing -->
+<section class="slide" aria-label="Tracing a statement">
+  <header class="s-head"><span class="eyebrow">How it works · 2</span><span>Tracing a statement</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr auto;gap:24px">
+    <h2 style="font-size:56px">Three steps take a statement to its first <span class="serif-i hl">report</span></h2>
+    <div class="steps three" style="align-self:center">
+      <div class="step"><span class="n">1</span><span class="label">Shortlist</span><h3>Find 30 candidates</h3><svg class="mini" data-mini="field" viewBox="0 0 400 104" role="img" aria-label="Thirty quotes picked out of a large field."></svg><p>Given a sentence like “X said that…”, pull the 30 quotes that share the most distinctive words with it.</p><p class="clue">Best clue: the speaker's name.<br>Only quotes that existed before the statement was published.</p></div>
+      <div class="step"><span class="n">2</span><span class="label">Careful reading</span><h3>Keep the ones that say it</h3><svg class="mini" data-mini="pick" viewBox="0 0 400 104" role="img" aria-label="Of thirty candidates, four are kept."></svg><p>A small, fast AI model reads the shortlist and picks the quotes that actually say what the statement claims.</p><p class="clue">The same claim, not just the same topic.</p></div>
+      <div class="step live"><span class="n">3</span><span class="label mag">First report</span><h3>Pick the earliest article</h3><svg class="mini" data-mini="time" viewBox="0 0 400 104" role="img" aria-label="Articles on a time line. An earlier article with only a date is skipped; the earliest one with a precise time is the first report."></svg><p>For the quotes it picked, list every article that carried them and choose the earliest one.</p><p class="clue">Only articles with a precise publication time.</p></div>
+    </div>
+    <p class="pull rule-top" style="font-size:28px">Only the reading step uses an AI model. The shortlist is a word search, the first report a sort by time.</p>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Who said it first? · Search: BM25 · Reader: Claude Haiku 5.5</span><span class="num"></span></footer>
+</section>
+
+<!-- 6 · Getting better automatically -->
+<section class="slide" aria-label="Getting better automatically">
+  <header class="s-head"><span class="eyebrow">Build the thing that builds</span><span>Getting better automatically</span></header>
+  <div class="s-body" style="grid-template-rows:1fr auto;gap:26px">
+    <div style="display:grid;grid-template-columns:400px 1fr;gap:64px;align-items:center">
+      <svg class="loop big" data-stages="TEST|DIAGNOSE|CHANGE|KEEP?" data-center="tracer" data-hot="3" data-size="60"
+        viewBox="0 0 720 640" width="400" height="356" role="img" aria-label="Improvement loop: test, diagnose, change, keep or drop, and again."></svg>
+      <div style="display:grid;gap:20px;align-content:center">
+        <h2 style="font-size:54px">The tracer improves itself, and a locked test keeps it <span class="serif-i hl">honest</span></h2>
+        <dl class="defs compact">
+          <div><dt>Test</dt><dd>364 statements where we already know which article came first, split into three sets.</dd></div>
+          <div><dt>Diagnose</dt><dd>A stronger AI model looks at the mistakes and works out their common cause.</dd></div>
+          <div><dt>Change</dt><dd>It suggests a small change to how the shortlist is built or how the checker reads.</dd></div>
+          <div><dt>Keep?</dt><dd>Only if it fixes clearly more questions than it breaks (beyond run-to-run noise), and does no worse on the second set.</dd></div>
+        </dl>
+      </div>
+    </div>
+    <div class="sets" role="img" aria-label="Share of statements whose true first report was found. Practice set, 145 statements: 58% at the start, 88% now. Second set, 73 statements: 60% at the start, 86% now. Final set, 146 statements, locked: 71% at the start; scored again only at the end.">
+      <div class="set"><span class="label">Practice set · 145</span><p>The stronger model studies mistakes here.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:58%"></span></span><b>58%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:88%"></span></span><b>88%</b></div></div>
+      <div class="set two"><span class="label">Second set · 73</span><p>Never studied; a change that does worse here is dropped.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:60%"></span></span><b>60%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:86%"></span></span><b>86%</b></div></div>
+      <div class="set lock"><span class="label"><svg width="14" height="17" viewBox="0 0 14 17" aria-hidden="true" style="display:inline;vertical-align:-2px;margin-right:8px;overflow:visible"><path d="M3.5 8V5.5a3.5 3.5 0 0 1 7 0V8" style="fill:none;stroke:var(--lime);stroke-width:2"/><rect x="0.5" y="8" width="13" height="9" rx="1.5" style="fill:var(--lime)"/></svg>Final set · 146 · locked</span><p>Scored once at the start, once at the very end.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:71%"></span></span><b>71%</b><span class="k">end</span><span class="pending">scored at the very end</span></div></div>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Bars: first report found, at the start vs. after 8 rounds (3 changes kept) · Improver: Claude Opus 5.5</span><span class="num"></span></footer>
+</section>
+
+<!-- 7 · Implications: beyond the news, and the commons -->
+<section class="slide" aria-label="Implications">
+  <header class="s-head"><span class="eyebrow">Implications</span><span>Beyond the news</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr;gap:28px">
+    <h2 style="font-size:54px">News is the simple case; next we can trace where ideas and inventions <span class="serif-i hl">come from</span></h2>
+    <div class="split">
+      <div>
+        <span class="label mag">From words to ideas</span>
+        <div class="stairs" role="img" aria-label="A staircase from easy to hard: quotes (the same words, which we trace today), claims, ideas, inventions, and reconceptualizations.">
+          <div class="st" style="margin-left:208px"><b>Reconceptualizations</b><span>the same thing, seen anew</span></div>
+          <div class="st" style="margin-left:156px"><b>Inventions</b><span>the same mechanism</span></div>
+          <div class="st" style="margin-left:104px"><b>Ideas</b><span>the same idea, new context</span></div>
+          <div class="st" style="margin-left:52px"><b>Claims</b><span>the same meaning</span></div>
+          <div class="st now"><b>Quotes</b><span>the same words · today</span></div>
+        </div>
+        <p class="src-p">Each step up needs a looser sense of “the same”. The method stays: find the versions, order them in time, check the earliest.</p>
+      </div>
+      <div>
+        <span class="label mag">Only in the open</span>
+        <svg class="loop" data-stages="PUBLISH OPENLY|TRACED|CREDITED|SHARE MORE" data-center="commons" data-hot="0" data-size="58"
+          viewBox="0 0 720 640" width="450" height="400" style="justify-self:center;margin:-10px 0 -20px" role="img" aria-label="A loop: publish openly, the origin is traced, the author is credited, people share more, and again."></svg>
+        <p class="src-p">We can only trace what is published openly. Then credit goes to whoever shared an idea first, and that rewards contributing to the commons.</p>
+      </div>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg>data.Flowers × Plastachio · Who said it first?</span><span class="num"></span></footer>
+</section>
+
+<!-- 8 · Why it matters and next -->
+<section class="slide" aria-label="Why it matters and next steps">
+  <header class="s-head"><span class="eyebrow">Beyond quotes</span><span>Next steps</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr auto auto;gap:26px">
+    <h2 style="font-size:56px">The same loop can keep any model of reality <span class="serif-i hl">aligned</span></h2>
+    <div style="display:grid;grid-template-columns:560px 1fr;gap:72px;align-items:center">
+      <svg viewBox="0 0 620 300" width="560" height="271" role="img" aria-label="Two circles, reality and model. Retelling carries reality into the model and lets it drift; tracing runs back from the model to reality and corrects it.">
+        <defs>
+          <marker id="al-m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" class="link-head"/></marker>
+          <marker id="al-k" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" class="arrow-head"/></marker>
+        </defs>
+        <circle cx="110" cy="150" r="92" style="fill:var(--lime);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="110" y="162" text-anchor="middle" class="lp-center" style="font-size:40px;fill:var(--on-lime)">reality</text>
+        <circle cx="510" cy="150" r="92" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="510" y="162" text-anchor="middle" class="lp-center" style="font-size:40px">model</text>
+        <path d="M188,98 Q310,8 432,98" class="link" marker-end="url(#al-m)"/>
+        <text x="310" y="30" text-anchor="middle" class="link-label" style="font-size:17px">RETELLING · DRIFT</text>
+        <path d="M432,202 Q310,292 188,202" style="fill:none;stroke:var(--ink);stroke-width:2.5" marker-end="url(#al-k)"/>
+        <text x="310" y="286" text-anchor="middle" style="font-family:var(--mono);font-size:17px;letter-spacing:.06em">TRACING · CORRECTION</text>
+      </svg>
+      <div style="display:grid;gap:14px">
+        <span class="label">Next</span>
+        <ol class="nexts">
+          <li>Score the locked final set.</li>
+          <li>Spot wire and press-release copies by their shared text.</li>
+          <li>Map which outlets copy which.</li>
+          <li>Follow paraphrased facts, not only quotes.</li>
+          <li>Add the other twelve years of Quotebank, 2008–2019.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="cols rule-top" style="grid-template-columns:repeat(4,1fr);gap:40px">
+      <p style="font-size:19px"><span class="label mag">Newsrooms</span>Check who said it, and where it first ran, before repeating it.</p>
+      <p style="font-size:19px"><span class="label mag">AI answers</span>Cite the first report, not the tenth copy.</p>
+      <p style="font-size:19px"><span class="label mag">Training data</span>See which claims many models learned from the same copy.</p>
+      <p style="font-size:19px"><span class="label mag">Public data</span>data.Flowers runs the same loop so official data stays the source.</p>
+    </div>
+    <div class="cta"><span class="label">The idea</span><p>A claim traced to its first report is a claim our models can't quietly drift on.</p></div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><span>Prepared by <a href="https://jakul.in" target="_blank" rel="noopener">Dr. Aleks Jakulin</a> · <a href="https://data.flowers" target="_blank" rel="noopener">data.Flowers</a> × <a href="https://kevinchiu.org/" target="_blank" rel="noopener">Kevin Chiu</a>, <a href="https://www.linkedin.com/company/plastachio/" target="_blank" rel="noopener">Plastachio</a> · built at <a href="https://rsihouse.ai" target="_blank" rel="noopener">RSIHOUSE</a> × <a href="https://www.sundai.club/" target="_blank" rel="noopener">Sundai Club</a></span></span><span class="num"></span></footer>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Slide navigation">
+  <button type="button" id="prev" aria-label="Previous slide">← Back</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count" aria-live="polite"></span>
+  <button type="button" id="next" aria-label="Next slide">Next →</button>
+  <span class="hint">keys ← →</span>
+</nav>
+
+<script>
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent, text){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function text(parent, x, y, cls, s, anchor){
+    return el('text', {x, y, class:cls, 'text-anchor':anchor || 'middle'}, parent, s);
+  }
+
+  /* one loop: ring, clockwise arrows, four stage nodes; one node highlighted */
+  function loop(g, cx, cy, r, stages, center, hot, size){
+    el('circle', {cx, cy, r, class:'lp-ring'}, g);
+    [-45, 45, 135, 225].forEach(a => {
+      const t = a*Math.PI/180;
+      el('path', {d:'M-9,-8 L9,0 L-9,8 Z', class:'lp-arrow',
+        transform:`translate(${cx+r*Math.cos(t)} ${cy+r*Math.sin(t)}) rotate(${a+90})`}, g);
+    });
+    [-90, 0, 90, 180].forEach((a, i) => {
+      const t = a*Math.PI/180, x = cx+r*Math.cos(t), y = cy+r*Math.sin(t), off = 32;
+      el('circle', {cx:x, cy:y, r:13, class: i === hot ? 'lp-node hot' : 'lp-node'}, g);
+      if (a === -90) text(g, x, y-off, 'lp-label', stages[i]);
+      if (a === 90)  text(g, x, y+off+18, 'lp-label', stages[i]);
+      if (a === 0)   text(g, x+off, y+9, 'lp-label', stages[i], 'start');
+      if (a === 180) text(g, x-off, y+9, 'lp-label', stages[i], 'end');
+    });
+    text(g, cx, cy+18, 'lp-center', center).style.fontSize = (size || 62) + 'px';
+  }
+  document.querySelectorAll('svg.loop').forEach(svg => {
+    loop(svg, 360, 320, 185, svg.dataset.stages.split('|'), svg.dataset.center, +svg.dataset.hot, +svg.dataset.size);
+  });
+
+  /* word tiles: o = original word, m = same as original, x = different word, e = no word */
+  document.querySelectorAll('.tword').forEach(row => {
+    for (const c of row.dataset.w){
+      const i = document.createElement('i');
+      if (c !== 'o') i.className = c;
+      row.appendChild(i);
+    }
+  });
+
+  /* library: one quote, every article that carried it */
+  const lw = document.querySelector('.lib-words');
+  if (lw) for (let i = 0; i < 14; i++)
+    el('rect', {x:170+i*30, y:38, width:24, height:24, rx:4, style:'fill:var(--paper);stroke:var(--ink);stroke-width:2'}, lw);
+  const lr = document.querySelector('.lib-rows');
+  if (lr){
+    const X0 = 110, X1 = 590, AX = 312;
+    /* [row, x, kind]  kind: p = precise time, d = date only, f = first report */
+    const arts = [[0,130,'f'],[0,300,'p'],[1,172,'p'],[1,410,'p'],[2,152,'d'],[2,262,'p'],
+                  [3,214,'p'],[3,238,'p'],[3,470,'p'],[4,346,'d'],[4,520,'p']];
+    ['site A','site B','site C','site D','site E'].forEach((n, r) => {
+      const y = 140 + r*36;
+      text(lr, 0, y+5, 'small', n.toUpperCase(), 'start').style.fontSize = '15px';
+      el('line', {x1:X0, y1:y, x2:X1, y2:y, style:'stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5'}, lr);
+    });
+    el('line', {x1:X0, y1:AX, x2:X1, y2:AX, style:'stroke:var(--ink);stroke-width:2'}, lr);
+    el('path', {d:`M${X1-2},${AX-6} L${X1+8},${AX} L${X1-2},${AX+6} Z`, class:'arrow-head'}, lr);
+    ['DAY 1','DAY 2','DAY 3','DAY 4'].forEach((d, i) => text(lr, 150+i*120, AX+24, 'small', d));
+    arts.forEach(([r, x, k]) => {
+      const y = 140 + r*36;
+      if (k === 'f') el('circle', {cx:x, cy:y, r:11, style:'fill:var(--lime);stroke:var(--ink);stroke-width:2.5'}, lr);
+      else if (k === 'd') el('circle', {cx:x, cy:y, r:8, style:'fill:var(--paper);stroke:var(--ink-2);stroke-width:2;stroke-dasharray:3 3'}, lr);
+      else el('circle', {cx:x, cy:y, r:8, style:'fill:var(--ink)'}, lr);
+    });
+    text(lr, 150, 145, 'small', 'FIRST REPORT', 'start').style.fill = 'var(--ink)';
+  }
+
+  /* timeline ticks: 2008–2020, 42 px per year */
+  document.querySelectorAll('.tl-ticks').forEach(g => {
+    for (let y = 2008; y <= 2020; y += 2){
+      const x = 10 + (y-2008)*42;
+      el('line', {x1:x, y1:58, x2:x, y2:66, style:'stroke:var(--ink);stroke-width:2'}, g);
+      text(g, x, 86, 'small', String(y));
+    }
+  });
+
+  /* tracing steps: field of quotes → 30 → kept → earliest with a precise time */
+  let seed = 7;
+  const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+  document.querySelectorAll('svg.mini').forEach(svg => {
+    const kind = svg.dataset.mini;
+    if (kind === 'field'){
+      const cells = [];
+      for (let r = 0; r < 6; r++) for (let c = 0; c < 25; c++) cells.push([8+c*16, 10+r*16]);
+      const picked = new Set();
+      while (picked.size < 30) picked.add(Math.floor(rnd()*cells.length));
+      cells.forEach(([x, y], i) => picked.has(i)
+        ? el('circle', {cx:x, cy:y, r:5.5, style:'fill:var(--ink)'}, svg)
+        : el('circle', {cx:x, cy:y, r:2.6, style:'fill:var(--rule)'}, svg));
+    }
+    if (kind === 'pick'){
+      const kept = [3, 7, 14, 22];
+      for (let i = 0; i < 30; i++){
+        const x = 20 + (i%10)*38, y = 18 + Math.floor(i/10)*34;
+        kept.includes(i)
+          ? el('circle', {cx:x, cy:y, r:12, style:'fill:var(--lime);stroke:var(--ink);stroke-width:2.5'}, svg)
+          : el('circle', {cx:x, cy:y, r:12, style:'fill:var(--paper);stroke:var(--ink);stroke-width:2;opacity:.3'}, svg);
+      }
+    }
+    if (kind === 'time'){
+      el('line', {x1:10, y1:70, x2:384, y2:70, style:'stroke:var(--ink);stroke-width:2'}, svg);
+      el('path', {d:'M382,64 L392,70 L382,76 Z', class:'arrow-head'}, svg);
+      el('circle', {cx:40, cy:70, r:9, style:'fill:var(--paper);stroke:var(--ink-2);stroke-width:2;stroke-dasharray:3 3'}, svg);
+      text(svg, 40, 44, 'small', 'DATE ONLY');
+      el('circle', {cx:112, cy:70, r:13, style:'fill:var(--lime);stroke:var(--ink);stroke-width:2.5'}, svg);
+      text(svg, 112, 104, 'small', 'FIRST').style.fill = 'var(--ink)';
+      [168, 204, 250, 300, 346].forEach(x => el('circle', {cx:x, cy:70, r:8, style:'fill:var(--ink)'}, svg));
+      text(svg, 392, 100, 'small', 'TIME', 'end');
+    }
+  });
+
+  /* navigation */
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const N = slides.length, pad = n => String(n).padStart(2, '0');
+  slides.forEach((s, i) => { const f = s.querySelector('.num'); if (f) f.textContent = pad(i+1) + ' / ' + pad(N); });
+
+  const dotsEl = document.getElementById('dots');
+  const dots = slides.map((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Slide ' + (i+1) + ': ' + (s.getAttribute('aria-label') || ''));
+    b.addEventListener('click', () => go(i));
+    dotsEl.appendChild(b);
+    return b;
+  });
+  const prev = document.getElementById('prev'), next = document.getElementById('next'), count = document.getElementById('count');
+  let cur = 0;
+
+  function fit(){
+    const r = document.getElementById('deck').getBoundingClientRect();
+    const s = Math.max(.1, Math.min((r.width-40)/1600, (r.height-32)/900));
+    document.documentElement.style.setProperty('--s', s);
+  }
+  function go(i){
+    cur = Math.max(0, Math.min(N-1, i));
+    slides.forEach((s, k) => { s.classList.toggle('is-active', k === cur); s.setAttribute('aria-hidden', String(k !== cur)); });
+    dots.forEach((d, k) => d.setAttribute('aria-current', String(k === cur)));
+    count.textContent = pad(cur+1) + ' / ' + pad(N);
+    prev.disabled = cur === 0; next.disabled = cur === N-1;
+    try { history.replaceState(null, '', '#' + (cur+1)); } catch (e) {}
+  }
+  prev.addEventListener('click', () => go(cur-1));
+  next.addEventListener('click', () => go(cur+1));
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); go(cur+1); }
+    else if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); go(cur-1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(N-1);
+  });
+  let x0 = null;
+  document.getElementById('deck').addEventListener('pointerdown', e => { x0 = e.clientX; });
+  document.getElementById('deck').addEventListener('pointerup', e => {
+    if (x0 !== null && Math.abs(e.clientX - x0) > 60) go(cur + (e.clientX < x0 ? 1 : -1));
+    x0 = null;
+  });
+  window.addEventListener('resize', fit);
+
+  let start = 0;
+  try { start = (parseInt(location.hash.slice(1), 10) || 1) - 1; } catch (e) {}
+  fit(); go(start);
+})();
+</script>
