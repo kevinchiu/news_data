@@ -19,7 +19,7 @@
   },
   "best_version": 0,
   "best_config": "experiments/lines/hard/configs/v0.json",
-  "round": 1,
+  "round": 2,
   "train_metrics": {
     "n": 145,
     "recall_at_k": 0.43448275862068964,

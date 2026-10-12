@@ -15,8 +15,42 @@ self-improvement loop (with a dashboard screenshot) and where this leads.
 - [HTML](docs/slides/who-said-it-first.html): open it locally and use ← → to move between slides.
 
 The figures come from the dashboard at 5:20 PM on 2026-10-11 (round 9 of the all-knobs line). The
-locked test set hasn't been scored again yet. Prepared by Aleks Jakulin (data.Flowers) with Kevin Chiu (Plastachio) at an
+locked test set was scored afterwards — see Results. Prepared by Aleks Jakulin (data.Flowers) with Kevin Chiu (Plastachio) at an
 RSIHOUSE × Sundai Club hack.
+
+## Results (final, 2026-10-11)
+
+First-appearance accuracy (the tracer names the article that first carried the quote; ground
+truth v2). The loop ran four lines; the best config is the main line's v3
+(`experiments/configs/v3.json`), reached in 3 accepted changes and unchanged over the last 9 rounds.
+
+| Split | Baseline v0 | Best v3 |
+|---|---|---|
+| Train (145) | 0.621 | 0.834 |
+| Validation (73) | 0.644 | 0.849 |
+| Watch set (100, held out, never seen by the loop) | 0.60 | 0.85 |
+| **Test (146, scored once at the end)** | **0.705** | **0.884** (95% CI 0.82–0.93; 32 items fixed, 6 broken) |
+
+What the loop found (Claude Opus 5.5 proposing, Haiku 5.5 verifying, 2 Haiku calls per claim):
+1. **Speaker-aware search** (index quote + speaker, query = content + speaker): search recall
+   0.72 → 0.92 — found independently by the main and the retrieval-only lines.
+2. **Stricter verifier prompt** (the quote must contain every part of the claim; stricter test for
+   unattributed quotes): wrong earlier matches 0.23 → ~0.01.
+
+Caveats: about 5 points of the early gain came from the v1 ground truth's blind spot (earlier
+renderings of the same quote counted as wrong) and were removed by ground truth v2. On harder
+queries (`paraphrase_hard`: speaker described by role, gist reworded) v3 drops to 0.45 on
+validation, and search recall tops out at 47.6% (exhaustive sweep) — the obvious next target.
+
+## Running the demo
+
+```
+.venv/bin/python -I scripts/dashboard.py                   # loop dashboard on 127.0.0.1:8765
+.venv/bin/python -I scripts/app.py --host 0.0.0.0          # Firstline app on :8780, dashboard tab proxied in
+```
+
+Open http://<host>:8780/ — "Trace a statement" (`#trace`) and "Self-improvement loop" (`#loop`).
+The app always serves the loop's current best config.
 
 ## Setup
 
@@ -71,11 +105,13 @@ All tunables live in `config/` (`scripts/qb_config.py` defines what the loop may
 - `scripts/evaluate.py`: recall@k, verifier recall, false-positive-earlier, first appearance
   (headline), first original outlet, Haiku calls per claim.
 - `scripts/improve.py`: each round Claude Opus 5.5 reads failures and proposes up to three config
-  changes; candidates are screened (retrieval changes free via recall@k), the best is scored on a
-  60-item train subset and accepted only if it fixes ≥ threshold more items than it breaks (threshold
-  from measured run-to-run noise) and doesn't lose on val. Borderline candidates (+1/+2) get a second
-  look on the full 145-item train split against a threshold scaled to that size. Lines can run in parallel with a knob
-  focus (`--line/--focus`) and be combined with `merge`. Log: `experiments/**/ledger.jsonl`.
+  changes; candidates are screened (retrieval changes free via recall@k), the top two are scored on
+  train (`--train-n`, 145 in the final runs) with val in parallel, and one is accepted only if it fixes
+  ≥ threshold more items than it breaks (threshold from measured run-to-run noise) and doesn't lose on
+  val. With a train subset, borderline candidates (+1/+2) get a second look on the full split. Lines can
+  run in parallel with a knob focus (`--line/--focus`), on a query form (`--mode paraphrase_hard`), and
+  be combined with `merge`. Log: `experiments/**/ledger.jsonl`; `retrieval_sweep.py` maps the full
+  retrieval grid for the dashboard's search-space view.
 - Dashboard: `scripts/dashboard.py` → http://127.0.0.1:8765/
 
 Anti-gaming choices: the loop cannot change the outlet-count filter, time window, variant

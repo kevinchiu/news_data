@@ -1,7 +1,7 @@
 {
   "best_version": 3,
   "best_config": "experiments/configs/v3.json",
-  "round": 11,
+  "round": 12,
   "threshold": 4,
   "noise": {
     "flips": 5,
