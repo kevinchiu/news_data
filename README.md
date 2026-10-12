@@ -73,8 +73,8 @@ Claude Code (`claude -p`), so a logged-in Claude Code install is required to run
 | Quotebank 2020 (Jan–Apr), EPFL, CC-BY-4.0 | 5.24M unique quotes; 16.7M quote mentions with timestamp, outlet, URL, speaker, surrounding text | `data/news.duckdb` (`quotes`, `quote_mentions`, `quote_urls`) |
 | Quote variants | 8-gram links between trimmed/edited versions of a quote | `quote_links`, `quote_clusters` |
 | Domain labels | hand-curated wire / press_release / aggregator / feed + ownership groups | `data/domain_labels.csv` → `domains` view |
-| Reuters-21578 (1987) | dev set only (single outlet, too old/narrow) | `reuters_*` tables |
-| GDELT GKG wire rows (partial, 754/11,615 files) | AP/Reuters/AFP/… articles with GDELT-extracted quotes | `gdelt_wire_articles`, `wire_quote_matches` (paused) |
+| Reuters-21578 (1987) | dev set only (single outlet, too old/narrow); its text is not redistributed here — `scripts/make_bench.py` rebuilds the early dev benchmark locally | `reuters_*` tables |
+| GDELT GKG wire rows (Jan–Apr 2020, all 11,615 files fetched) | AP/Reuters/AFP/… articles with GDELT-extracted quotes | `gdelt_wire_articles`, `wire_quote_matches` (not used by the tracer by default) |
 
 Rebuild: `scripts/parse_quotebank_quotes.py`, `scripts/parse_quotebank_parallel.py`,
 `scripts/build_db.py`, `scripts/quote_variants.py`.
@@ -144,3 +144,10 @@ prompts that add names/numbers from train/val items are rejected.
    agreement) for true wire timestamps alongside Quotebank 2008–09.
 6. **Loop improvements.** Self-generated harder benchmark items when train saturates; a GEPA
    comparison. (Borderline second look: done.)
+
+## License and data
+
+Code: MIT (see `LICENSE`). Slides in `docs/slides/`: © their authors. No datasets are stored in
+this repo — `scripts/get_data.py` downloads them. Quotebank (Vaucher et al., WSDM 2021) is CC BY
+4.0; the benchmark and experiment files here include Quotebank quotations under that licence.
+Reuters-21578 is distributed by its maintainers for research use only and is not included.

@@ -11,3 +11,8 @@ __pycache__/
 *.log
 # runtime lock files
 *.lock
+
+# Reuters-21578 text (research-only terms): regenerate locally, don't redistribute
+bench/queries.jsonl
+bench/queries_ctx.jsonl
+out/
