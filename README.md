@@ -145,8 +145,22 @@ prompts that add names/numbers from train/val items are rejected.
 6. **Loop improvements.** Self-generated harder benchmark items when train saturates; a GEPA
    comparison. (Borderline second look: done.)
 
-## Data licences
+## Licences of what we use
 
-Slides in `docs/slides/`: © their authors. No datasets are stored in this repo — `scripts/get_data.py` downloads them. Quotebank (Vaucher et al., WSDM 2021) is CC BY
-4.0; the benchmark and experiment files here include Quotebank quotations under that licence.
-Reuters-21578 is distributed by its maintainers for research use only and is not included.
+No datasets are stored in this repo; `scripts/get_data.py` downloads them from their sources.
+
+| Used | Licence / terms |
+|---|---|
+| Quotebank (Vaucher et al., WSDM 2021), via Zenodo | CC BY 4.0 — the benchmark and experiment files here include Quotebank quotations under it |
+| Reuters-21578, Distribution 1.0 (UCI) | © Reuters Ltd.; free distribution for research purposes only (not included here) |
+| GDELT 2.1 GKG (gdeltproject.org) | Unlimited use and redistribution with a citation to the GDELT Project and a link to https://www.gdeltproject.org/ |
+| duckdb | MIT |
+| pyarrow | Apache-2.0 |
+| numpy | BSD-3-Clause (bundled parts: 0BSD, MIT, Zlib, CC0-1.0) |
+| scipy | BSD-3-Clause |
+| anthropic (Python SDK) | MIT |
+| rank-bm25 | Apache-2.0 |
+| Chart.js 4.4.1, Plotly.js 2.35.2 (loaded from jsDelivr) | MIT |
+| Claude models via Claude Code | Anthropic's terms of service |
+
+Slides in `docs/slides/` are © their authors.
