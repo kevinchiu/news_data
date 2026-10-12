@@ -145,9 +145,8 @@ prompts that add names/numbers from train/val items are rejected.
 6. **Loop improvements.** Self-generated harder benchmark items when train saturates; a GEPA
    comparison. (Borderline second look: done.)
 
-## License and data
+## Data licences
 
-Code: MIT (see `LICENSE`). Slides in `docs/slides/`: © their authors. No datasets are stored in
-this repo — `scripts/get_data.py` downloads them. Quotebank (Vaucher et al., WSDM 2021) is CC BY
+Slides in `docs/slides/`: © their authors. No datasets are stored in this repo — `scripts/get_data.py` downloads them. Quotebank (Vaucher et al., WSDM 2021) is CC BY
 4.0; the benchmark and experiment files here include Quotebank quotations under that licence.
 Reuters-21578 is distributed by its maintainers for research use only and is not included.
