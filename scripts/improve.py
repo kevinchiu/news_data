@@ -37,9 +37,10 @@ from verify import claude_json  # noqa: E402
 
 ROOT = Path("experiments")
 EXP, LEDGER, STATE, FOCUS = ROOT, ROOT / "ledger.jsonl", ROOT / "state.json", None
-TRAIN_N, SENTINELS, MAX_PROPOSALS = 60, 15, 3
+TRAIN_N, SENTINELS, MAX_PROPOSALS, FULL_EVALS = 60, 15, 3, 2
+MODE = "paraphrase"  # which query form of each benchmark item is traced (see --mode)
 WORKERS = 12  # concurrent traces (each runs headless `claude -p` Haiku calls); the time is in those calls
-evaluate = partial(_evaluate, workers=WORKERS)
+evaluate = partial(_evaluate, workers=WORKERS, mode=MODE)
 IMPROVER_MODEL, IMPROVER_EFFORT = "claude-opus-5-5", "high"
 KNOB_HELP = {
     "retrieval.k": "number of BM25 candidates passed to the verifier (5-60)",
@@ -101,7 +102,7 @@ def configure(line=None, focus=None, workers=WORKERS):
     global EXP, LEDGER, STATE, FOCUS, evaluate
     EXP = ROOT if line in (None, "all") else ROOT / "lines" / line
     LEDGER, STATE, FOCUS = EXP / "ledger.jsonl", EXP / "state.json", focus
-    evaluate = partial(_evaluate, workers=workers)
+    evaluate = partial(_evaluate, workers=workers, mode=MODE)
     if EXP != ROOT and not STATE.exists():
         (EXP / "configs").mkdir(parents=True, exist_ok=True)
         shutil.copy(ROOT / "configs" / "v0.json", EXP / "configs" / "v0.json")
@@ -175,7 +176,7 @@ def leak_tokens(items):
     """Proper nouns and multi-digit numbers that appear in train items (quotes, paraphrases, speakers)."""
     toks = set()
     for it in items:
-        for text in (it["quotation"], it["paraphrase"], it["speaker"] or ""):
+        for text in (it["quotation"], it["paraphrase"], it.get("paraphrase_hard", ""), it["speaker"] or ""):
             for w in re.findall(r"\b[A-Z][a-z]{3,}\b|\b\d{2,}\b", text):
                 toks.add(w)
     return toks
@@ -201,7 +202,7 @@ def failure_report(items, rows, con, limit=16):
             if shown >= limit:
                 break
             it = its[r["quote_id"]]
-            lines += ["", f"[{cat}] STATEMENT: {it['paraphrase']}",
+            lines += ["", f"[{cat}] STATEMENT: {it[MODE]}",
                       f"  TRUE QUOTE ({it['speaker']}): \"{it['quotation']}\""]
             if r["matched"]:
                 wrong = [q for q in r["matched"] if q not in it["variant_ids"]]
@@ -315,41 +316,104 @@ def cmd_run(con, rounds, budget):
         for e, _, _ in screened:
             if e.get("decision"):
                 log(e)
-        for e, _, score in passed[1:]:
-            log(e | {"decision": "not_evaluated", "reason": f"pre-screen net {score:+d}, a better proposal was evaluated"})
-        chosen = (passed[0][0], passed[0][1]) if passed else None
-        if not chosen:
+        for e, _, score in passed[FULL_EVALS:]:
+            log(e | {"decision": "not_evaluated", "reason": f"pre-screen net {score:+d}, better proposals were evaluated"})
+        if not passed:
             log({"type": "round_end", "round": rnd, "accepted": False, "reason": "no proposal passed screening"})
             save_state(state)
             continue
 
-        entry, cand = chosen
-        m_new, rows_new = evaluate(cand, train, con=con)
-        spent += m_new["new_calls"]
-        fixed, broken = paired(rows_cur, rows_new)
-        net = fixed - broken
-        decision, reason, m_val_new = "rejected", f"train net {net:+d} < threshold {state['threshold']}", None
-        if net >= state["threshold"]:
-            m_val_new, _ = evaluate(cand, val, con=con)
-            spent += m_val_new["new_calls"]
-            if m_val_new["first_any"] >= state["val_metrics"]["first_any"]:
-                decision, reason = "accepted", f"train net {net:+d}, val {state['val_metrics']['first_any']:.3f}" \
-                                               f" -> {m_val_new['first_any']:.3f}"
-            else:
-                reason = f"train net {net:+d} but val dropped {state['val_metrics']['first_any']:.3f} -> " \
-                         f"{m_val_new['first_any']:.3f}"
-        log(entry | {"decision": decision, "reason": reason, "train": m_new, "val": m_val_new,
-                     "fixed": fixed, "broken": broken, "diff": qb_config.diff(cfg, cand),
-                     "new_calls": entry.get("new_calls", 0) + m_new["new_calls"] + (m_val_new or {}).get("new_calls", 0)})
-        print(f"  -> {decision}: {reason}")
-        if decision == "accepted":
+        def full_eval(entry, cand):
+            # train and val run at the same time (val is wasted if train fails; Haiku budget is ample)
+            with ThreadPoolExecutor(2) as ex:
+                f_tr, f_val = ex.submit(evaluate, cand, train, con=con), ex.submit(evaluate, cand, val, con=con)
+                (m_new, rows_new), (m_val_new, _) = f_tr.result(), f_val.result()
+            fixed, broken = paired(rows_cur, rows_new)
+            net = fixed - broken
+            reason, second, passes = f"train net {net:+d} < threshold {state['threshold']}", None, \
+                net >= state["threshold"]
+            if 0 < net < state["threshold"] and TRAIN_N < len(load_items("train")):
+                # borderline: look again on the rest of the train split, against a threshold scaled to
+                # the larger sample (noise grows ~ sqrt(n))
+                seen = {it["quote_id"] for it in train}
+                rest = [it for it in load_items("train") if it["quote_id"] not in seen]
+                m_rc, rows_rc = evaluate(cfg, rest, con=con)
+                m_rn, rows_rn = evaluate(cand, rest, con=con)
+                f2, b2 = paired(rows_rc, rows_rn)
+                n_all = len(train) + len(rest)
+                full_threshold = max(state["threshold"], math.ceil(
+                    1.64 * math.sqrt(state["noise"]["flips"] * n_all / len(train))))
+                second = {"n": n_all, "net": net + f2 - b2, "threshold": full_threshold,
+                          "new_calls": m_rc["new_calls"] + m_rn["new_calls"]}
+                passes = second["net"] >= full_threshold
+                reason = f"borderline train net {net:+d}; second look on {n_all} items net {second['net']:+d} " \
+                         f"{'>=' if passes else '<'} {full_threshold}"
+            decision = "rejected"
+            if passes:
+                train_note = f"train net {net:+d}" + (f" (second look {second['net']:+d}/{second['n']})" if second else "")
+                if m_val_new["first_any"] >= state["val_metrics"]["first_any"]:
+                    decision, reason = "accepted", f"{train_note}, val {state['val_metrics']['first_any']:.3f}" \
+                                                   f" -> {m_val_new['first_any']:.3f}"
+                else:
+                    reason = f"{train_note} but val dropped {state['val_metrics']['first_any']:.3f} -> " \
+                             f"{m_val_new['first_any']:.3f}"
+            calls = entry.get("new_calls", 0) + m_new["new_calls"] + m_val_new["new_calls"] + \
+                (second or {}).get("new_calls", 0)
+            return {"entry": entry, "cand": cand, "decision": decision, "reason": reason, "net": net,
+                    "fixed": fixed, "broken": broken, "train": m_new, "val": m_val_new, "second": second,
+                    "calls": calls}
+
+        # fully evaluate the top proposals side by side; accept at most one (best net, then val)
+        with ThreadPoolExecutor(FULL_EVALS) as ex:
+            results = list(ex.map(lambda pc: full_eval(pc[0], pc[1]), [(e, c) for e, c, _ in passed[:FULL_EVALS]]))
+        winners = sorted([r for r in results if r["decision"] == "accepted"],
+                         key=lambda r: (-r["net"], -r["val"]["first_any"]))
+        for r in results:
+            if winners and r is not winners[0] and r["decision"] == "accepted":
+                r["decision"], r["reason"] = "runner_up", r["reason"] + "; another proposal scored higher"
+            spent += r["calls"]
+            log(r["entry"] | {"decision": r["decision"], "reason": r["reason"], "train": r["train"], "val": r["val"],
+                              "fixed": r["fixed"], "broken": r["broken"], "diff": qb_config.diff(cfg, r["cand"]),
+                              "second_look": r["second"], "new_calls": r["calls"]})
+            print(f"  -> {r['decision']}: {r['reason']}")
+        decision = "accepted" if winners else "rejected"
+        if winners:
+            w = winners[0]
             state["best_version"] += 1
-            state["best_config"] = save_config(cand, state["best_version"])
-            state["train_metrics"], state["val_metrics"] = m_new, m_val_new
+            state["best_config"] = save_config(w["cand"], state["best_version"])
+            state["train_metrics"], state["val_metrics"] = w["train"], w["val"]
         log({"type": "round_end", "round": rnd, "accepted": decision == "accepted"})
         save_state(state)
     print(f"\nbest: v{state['best_version']}  train {state['train_metrics']['first_any']:.3f}  "
           f"val {state['val_metrics']['first_any']:.3f}  ({spent} new Haiku calls in total)")
+
+
+def cmd_rebaseline(con):
+    """Re-score after a ground-truth change: v0 (train/val/test + noise) and this line's best (train/val).
+    Keeps the line's versions; the ledger records old vs new numbers."""
+    state = load_state()
+    train, val, test = load_items("train", TRAIN_N), load_items("val"), load_items("test")
+    v0 = qb_config.load(EXP / "configs" / "v0.json")
+    m0_tr, rows0 = evaluate(v0, train, con=con)
+    _, rows_noise = evaluate(v0, train, nonce="noise-1", con=con)
+    fixed, broken = paired(rows0, rows_noise)
+    flips = fixed + broken
+    threshold = max(2, math.ceil(1.64 * math.sqrt(flips)))
+    m0_val, _ = evaluate(v0, val, con=con)
+    m0_test, _ = evaluate(v0, test, con=con)
+    best = qb_config.load(state["best_config"])
+    mb_tr, _ = evaluate(best, train, con=con)
+    mb_val, _ = evaluate(best, val, con=con)
+    old = {k: state.get(k) for k in ("train_metrics", "val_metrics", "baseline_test", "threshold", "noise")}
+    state.update(threshold=threshold, noise={"flips": flips, "fixed": fixed, "broken": broken, "n": len(train)},
+                 baseline_test=m0_test, train_metrics=mb_tr, val_metrics=mb_val, gt_version=2)
+    save_state(state)
+    log({"type": "rebaseline", "round": state["round"], "gt_version": 2, "threshold": threshold,
+         "noise": state["noise"], "v0": {"train": m0_tr, "val": m0_val, "test": m0_test},
+         "best": {"version": state["best_version"], "train": mb_tr, "val": mb_val}, "old": old})
+    print(f"{EXP}: v0 train {m0_tr['first_any']:.3f} val {m0_val['first_any']:.3f} test {m0_test['first_any']:.3f} | "
+          f"best v{state['best_version']} train {mb_tr['first_any']:.3f} val {mb_val['first_any']:.3f} | "
+          f"was val {old['val_metrics']['first_any']:.3f} | threshold {threshold} (flips {flips})")
 
 
 def wilson(p, n, z=1.96):
@@ -400,19 +464,28 @@ def cmd_final(con, config=None):
 
 
 def main():
+    global TRAIN_N, MODE
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["baseline", "run", "merge", "final"])
+    ap.add_argument("command", choices=["baseline", "rebaseline", "run", "merge", "final"])
     ap.add_argument("--rounds", type=int, default=10)
     ap.add_argument("--budget", type=int, default=2500, help="max new Haiku calls across all rounds")
     ap.add_argument("--line", help="improvement line name (default: the main line, experiments/)")
     ap.add_argument("--focus", choices=["retrieval", "verify"], help="restrict the line to one knob group")
     ap.add_argument("--workers", type=int, default=WORKERS)
+    ap.add_argument("--mode", default=MODE, help="query form to trace: paraphrase | paraphrase_hard | verbatim")
+    ap.add_argument("--train-n", type=int, default=TRAIN_N,
+                    help="train items scored per round (the full split is 145); rebaseline after changing it")
     ap.add_argument("--lines", default="all,retrieval,verify", help="for merge")
     ap.add_argument("--config", help="for final: config to score (default: this line's best)")
     a = ap.parse_args()
+    TRAIN_N, MODE = a.train_n, a.mode
     configure(a.line, a.focus, a.workers)
     con = duckdb.connect("data/news.duckdb", read_only=True)
-    {"baseline": lambda: cmd_baseline(con), "final": lambda: cmd_final(con, a.config),
+    # many traces run at once and each BM25 query would otherwise use every core; several loop
+    # processes share the machine, so keep each DuckDB instance small
+    con.execute("SET threads TO 3")
+    {"baseline": lambda: cmd_baseline(con), "rebaseline": lambda: cmd_rebaseline(con),
+     "final": lambda: cmd_final(con, a.config),
      "merge": lambda: cmd_merge(con, a.lines.split(",")),
      "run": lambda: cmd_run(con, a.rounds, a.budget)}[a.command]()
 

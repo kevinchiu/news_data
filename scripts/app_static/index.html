@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firstline</title>
+<meta name="description" content="Trace a statement from the news back to the first outlet that carried the quotation.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Cpath d='M8 22h16M8 16h10M8 10h6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef;
+  --surface: #fcfcfb;
+  --surface-2: #efeee9;
+  --border: #dedcd5;
+  --text: #0f0f0e;
+  --text-2: #4a4946;
+  --muted: #64635e;
+  --link: #1d5fae;
+  --accent: #1f64b8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3edfa;
+  --series: #2a78d6;
+  --series-fill: rgba(42, 120, 214, 0.10);
+  --first: #d4561f;
+  --orig: #128a5f;
+  --grid: #e7e5df;
+  --ok: #0f7a4a;
+  --ok-soft: #e1f3ea;
+  --warn: #8a5a00;
+  --warn-soft: #fbf0d9;
+  --err: #b42318;
+  --err-soft: #fdecea;
+  --k-wire: #c27c00;
+  --k-agg: #6250d6;
+  --k-pr: #c4407a;
+  --k-feed: #7a7973;
+  --k-outlet: #2a78d6;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
+  --radius: 14px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --surface: #1a1a19; --surface-2: #242422; --border: #36352f;
+    --text: #f0efec; --text-2: #c9c8be; --muted: #a3a298; --link: #8bb8f2;
+    --accent: #2f6fc0; --accent-ink: #ffffff; --accent-soft: #1d2a3b;
+    --series: #3987e5; --series-fill: rgba(57, 135, 229, 0.16);
+    --first: #f07a45; --orig: #2fbf8a; --grid: #2c2c29;
+    --ok: #5fd39d; --ok-soft: #15291f; --warn: #f0c060; --warn-soft: #2d2412;
+    --err: #ff8a80; --err-soft: #331715;
+    --k-wire: #e0a030; --k-agg: #9085e9; --k-pr: #e070a0; --k-feed: #9d9c93; --k-outlet: #3987e5;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --surface: #1a1a19; --surface-2: #242422; --border: #36352f;
+  --text: #f0efec; --text-2: #c9c8be; --muted: #a3a298; --link: #8bb8f2;
+  --accent: #2f6fc0; --accent-ink: #ffffff; --accent-soft: #1d2a3b;
+  --series: #3987e5; --series-fill: rgba(57, 135, 229, 0.16);
+  --first: #f07a45; --orig: #2fbf8a; --grid: #2c2c29;
+  --ok: #5fd39d; --ok-soft: #15291f; --warn: #f0c060; --warn-soft: #2d2412;
+  --err: #ff8a80; --err-soft: #331715;
+  --k-wire: #e0a030; --k-agg: #9085e9; --k-pr: #e070a0; --k-feed: #9d9c93; --k-outlet: #3987e5;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+a { color: var(--link); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--series); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+/* header */
+header.top { padding: 22px 0 8px; }
+.brand-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; gap: 12px; align-items: center; }
+.logo { width: 38px; height: 38px; border-radius: 10px; background: var(--series); display: grid; place-items: center; flex: none; }
+.logo svg { width: 22px; height: 22px; }
+.brand h1 { margin: 0; font-size: 24px; letter-spacing: -0.02em; line-height: 1.1; }
+.brand p { margin: 2px 0 0; color: var(--text-2); font-size: 14.5px; }
+.badge {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 6px 12px 6px 10px; font-size: 13px; box-shadow: var(--shadow); max-width: 100%;
+}
+.badge:hover { border-color: var(--series); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--ok-soft); }
+.badge b { font-weight: 650; }
+.badge .sub { color: var(--muted); }
+.badge.flash { animation: flash 1.6s ease-out 1; }
+@keyframes flash { 0% { box-shadow: 0 0 0 0 var(--series); } 100% { box-shadow: 0 0 0 12px transparent; } }
+
+/* cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.input-card { padding: 18px; margin-top: 14px; }
+label.lbl { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
+textarea {
+  width: 100%; min-height: 84px; resize: vertical; padding: 12px 14px; font: inherit; font-size: 16px;
+  color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+}
+textarea:focus, input:focus { outline: none; border-color: var(--series); box-shadow: 0 0 0 3px var(--accent-soft); }
+.controls { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 10px; }
+.asof { display: flex; flex-direction: column; }
+.asof label { font-size: 12.5px; color: var(--text-2); margin-bottom: 4px; }
+input[type="datetime-local"] {
+  font: inherit; font-size: 14px; color: var(--text); background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px; min-height: 42px;
+}
+.count { color: var(--muted); font-size: 12.5px; margin-left: auto; align-self: center; }
+.count.over { color: var(--err); font-weight: 600; }
+button.primary {
+  background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; font: inherit;
+  font-weight: 650; padding: 0 22px; min-height: 42px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center;
+}
+button.primary:hover { filter: brightness(1.08); }
+button.primary:disabled { opacity: .55; cursor: progress; }
+.coverage { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.examples { margin-top: 14px; }
+.examples h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 650; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: inherit; font-size: 13.5px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 12px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; text-align: left;
+}
+.chip:hover { border-color: var(--series); background: var(--accent-soft); }
+.chip .t { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-2); }
+
+/* progress */
+.progress { padding: 18px; margin-top: 16px; }
+.progress-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.progress-head h2 { margin: 0; font-size: 16px; }
+.elapsed { font-family: var(--mono); font-size: 13px; color: var(--text-2); }
+.steps { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 10px; }
+.steps li { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.steps li .ic { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex: none; display: grid; place-items: center; font-size: 12px; }
+.steps li.active { color: var(--text); font-weight: 600; }
+.steps li.active .ic { border-color: var(--series); border-top-color: transparent; animation: spin .9s linear infinite; }
+.steps li.done { color: var(--text-2); }
+.steps li.done .ic { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.steps li .note { font-weight: 400; color: var(--muted); font-size: 13px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .steps li.active .ic { animation: none; border-top-color: var(--series); } .badge.flash { animation: none; } }
+
+/* results */
+#result { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+#result > *, .headline-cards > *, .brand > div, main, .wrap { min-width: 0; }
+body { overflow-x: hidden; }
+.section-title { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 650; }
+.quote-card { padding: 18px 20px; }
+.quote-card + .quote-card { margin-top: 10px; }
+.quote-text { font-size: 18px; line-height: 1.5; margin: 0; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+.quote-text::before { content: "\201C"; color: var(--series); font-size: 1.3em; line-height: 0; margin-right: 2px; }
+.quote-text::after { content: "\201D"; color: var(--series); font-size: 1.3em; line-height: 0; margin-left: 2px; }
+.quote-meta { margin-top: 10px; color: var(--text-2); font-size: 13.5px; display: flex; gap: 6px 14px; flex-wrap: wrap; }
+.quote-meta b { color: var(--text); }
+.more-quotes { font: inherit; font-size: 13.5px; background: none; border: 0; color: var(--link); cursor: pointer; padding: 6px 0 0; text-decoration: underline; }
+
+.headline-cards { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .headline-cards { grid-template-columns: minmax(0, 1fr); } }
+.hl { padding: 18px 20px; position: relative; overflow: hidden; }
+.hl::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--first); }
+.hl.orig::before { background: var(--orig); }
+.hl .kicker { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2); font-weight: 700; }
+.hl .outlet { font-size: 22px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.hl .when { color: var(--text-2); font-size: 14px; }
+.hl .title { margin: 10px 0 0; font-size: 14.5px; overflow-wrap: anywhere; }
+.hl .explain { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+.bench { margin-top: 12px; font-size: 13px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); color: var(--text-2); overflow-wrap: anywhere; }
+.bench.ok { background: var(--ok-soft); color: var(--text); }
+.bench.ok b { color: var(--ok); }
+
+.kind { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; background: var(--surface-2); white-space: nowrap; }
+.kind::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--k-outlet); }
+.kind.k-wire::before { background: var(--k-wire); }
+.kind.k-aggregator::before { background: var(--k-agg); }
+.kind.k-press_release::before { background: var(--k-pr); }
+.kind.k-feed::before { background: var(--k-feed); }
+
+.spread-card { padding: 18px 20px; }
+.spread-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.spread-head .big { font-size: 15px; color: var(--text-2); }
+.spread-head .big b { color: var(--text); font-size: 20px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-2); margin-top: 6px; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chart-box { position: relative; height: 260px; margin-top: 10px; }
+@media (max-width: 560px) { .chart-box { height: 210px; } }
+.chart-fallback { color: var(--muted); font-size: 13px; padding: 20px 0; }
+
+.table-wrap { overflow-x: auto; margin-top: 16px; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+td.time { white-space: nowrap; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); }
+td.outlet { font-weight: 600; overflow-wrap: anywhere; min-width: 120px; }
+td.headline { min-width: 220px; overflow-wrap: anywhere; }
+tr.is-first td { background: color-mix(in srgb, var(--first) 9%, transparent); }
+tr.is-orig td { background: color-mix(in srgb, var(--orig) 9%, transparent); }
+.tag { display: inline-block; white-space: nowrap; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-left: 6px; }
+.tag.first { color: var(--first); } .tag.orig { color: var(--orig); }
+.dateonly { color: var(--muted); font-size: 11.5px; font-family: inherit; }
+.show-all { margin-top: 12px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--link); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+
+.how { padding: 14px 20px; font-size: 13px; color: var(--text-2); }
+.how ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 2px; }
+.how .cfg { margin-top: 8px; color: var(--muted); }
+.how code { font-family: var(--mono); font-size: 12px; }
+
+.message { padding: 22px 22px; }
+.message h2 { margin: 0 0 6px; font-size: 18px; }
+.message p { margin: 6px 0; color: var(--text-2); }
+.message ul { margin: 8px 0 0; padding-left: 20px; color: var(--text-2); }
+.message.error { border-color: color-mix(in srgb, var(--err) 45%, var(--border)); background: var(--err-soft); }
+.message.error h2 { color: var(--err); }
+.message .errtext { font-family: var(--mono); font-size: 12.5px; color: var(--text); overflow-wrap: anywhere; }
+
+footer.foot { margin: 32px 0 28px; color: var(--muted); font-size: 12.5px; display: flex; gap: 6px 16px; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+
+/* app shell: top-level tabs */
+:root { --bar-h: 52px; }
+.appbar { position: sticky; top: 0; z-index: 20; height: var(--bar-h); background: var(--surface); border-bottom: 1px solid var(--border); }
+.appbar-in { height: 100%; display: flex; align-items: stretch; gap: 18px; }
+.mini-brand { display: flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; font-weight: 700; font-size: 15px; letter-spacing: -0.01em; flex: none; }
+.mini-brand .logo { width: 26px; height: 26px; border-radius: 7px; }
+.mini-brand .logo svg { width: 16px; height: 16px; }
+[role="tablist"] { display: flex; align-items: stretch; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+[role="tablist"]::-webkit-scrollbar { display: none; }
+[role="tab"] {
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--text-2); background: none; border: 0; cursor: pointer;
+  padding: 0 12px; white-space: nowrap; position: relative; display: inline-flex; align-items: center; gap: 7px;
+}
+[role="tab"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: transparent; }
+[role="tab"]:hover { color: var(--text); }
+[role="tab"]:hover::after { background: var(--border); }
+[role="tab"][aria-selected="true"] { color: var(--text); }
+[role="tab"][aria-selected="true"]::after { background: var(--series); }
+[role="tab"]:focus-visible { outline-offset: -3px; }
+[role="tab"] svg { width: 16px; height: 16px; flex: none; opacity: .8; }
+.standalone { margin-left: auto; align-self: center; font-size: 13px; white-space: nowrap; flex: none; }
+@media (max-width: 600px) { .mini-brand, .standalone, [role="tab"] svg { display: none !important; } [role="tab"] { padding: 0 10px; } [role="tab"]:first-child { padding-left: 0; } [role="tab"]:first-child::after { left: 0; } }
+#panel-loop { position: relative; height: calc(100vh - var(--bar-h)); height: calc(100dvh - var(--bar-h)); }
+/* keep the dashboard frame laid out while another tab shows, so it never resizes to 0 (3D cameras, charts) */
+#panel-loop:not(.active) { position: fixed; top: var(--bar-h); left: -200vw; width: 100vw; visibility: hidden; }
+#panel-loop iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: var(--bg); opacity: 0; transition: opacity .2s; }
+#panel-loop iframe.loaded { opacity: 1; }
+.frame-wait { padding: 40px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<nav class="appbar" aria-label="Firstline">
+  <div class="wrap appbar-in">
+    <a class="mini-brand" href="#trace" aria-label="Firstline: trace a statement">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M5 17h14M5 12h9M5 7h5"/></svg></span>
+      <span class="mini-name">Firstline</span>
+    </a>
+    <div role="tablist" aria-label="Views" id="tabs">
+      <button type="button" role="tab" id="tab-trace" aria-controls="panel-trace" aria-selected="true" tabindex="0" data-view="trace">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>Trace a statement</button>
+      <button type="button" role="tab" id="tab-loop" aria-controls="panel-loop" aria-selected="false" tabindex="-1" data-view="loop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>Self-improvement loop</button>
+    </div>
+    <a class="standalone" id="standalone" href="/dash/" target="_blank" rel="noopener" hidden>Open dashboard in a new tab ↗</a>
+  </div>
+</nav>
+
+<div role="tabpanel" id="panel-trace" aria-labelledby="tab-trace">
+<div class="wrap">
+  <header class="top">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M5 17h14M5 12h9M5 7h5"/></svg>
+        </div>
+        <div>
+          <h1>Firstline</h1>
+          <p>Trace a line from the news back to the outlet that printed it first, and watch how it spread.</p>
+        </div>
+      </div>
+      <a class="badge" id="badge" href="#loop" title="Show the live self-improvement loop">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="badge-text">Loading tracer status…</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card input-card" aria-label="Trace a statement">
+      <form id="form" novalidate>
+        <label class="lbl" for="statement">Statement from a news story</label>
+        <textarea id="statement" name="statement" maxlength="500" required
+          placeholder="e.g. Ireland's prime minister said coronavirus cases will likely peak in April"></textarea>
+        <div class="controls">
+          <div class="asof">
+            <label for="asof">As of (optional)</label>
+            <input type="datetime-local" id="asof" name="asof" min="2020-01-01T00:00" max="2020-04-18T00:00">
+          </div>
+          <button class="primary" type="submit" id="go">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+            Trace
+          </button>
+          <span class="count" id="count" aria-live="polite">0 / 500</span>
+        </div>
+        <p class="coverage" id="coverage">Covers English-language news quotations from 1 Jan to 17 Apr 2020 (Quotebank). Works best with reported speech that names the speaker. “As of” limits the search to coverage published before that moment.</p>
+      </form>
+      <div class="examples">
+        <h2 id="ex-h">Try a held-out benchmark example</h2>
+        <div class="chips" id="chips" role="group" aria-labelledby="ex-h"></div>
+      </div>
+    </section>
+
+    <section class="card progress" id="progress" hidden aria-live="polite">
+      <div class="progress-head">
+        <h2 id="progress-title">Tracing…</h2>
+        <span class="elapsed" id="elapsed">0.0 s</span>
+      </div>
+      <ol class="steps" id="steps">
+        <li data-step="search"><span class="ic" aria-hidden="true"></span><span>Searching 5.2M quotations <span class="note">BM25 full-text</span></span></li>
+        <li data-step="verify"><span class="ic" aria-hidden="true"></span><span>Verifying candidates with Claude <span class="note">Haiku checks which quotes state it, ~5–15 s</span></span></li>
+        <li data-step="timeline"><span class="ic" aria-hidden="true"></span><span>Building the timeline <span class="note">16.7M mentions</span></span></li>
+      </ol>
+    </section>
+
+    <div id="result" aria-live="polite"></div>
+  </main>
+
+  <footer class="foot">
+    <span>Data: Quotebank (Vaucher et al., WSDM 2021), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Times as recorded in the corpus.</span>
+    <span><a href="#loop" id="dash-link">Self-improvement dashboard →</a></span>
+  </footer>
+</div>
+</div>
+
+<div role="tabpanel" id="panel-loop" aria-labelledby="tab-loop">
+  <p class="frame-wait" id="frame-wait">Loading the self-improvement dashboard…</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+"use strict";
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const KIND_LABEL = { outlet: "outlet", wire: "wire", aggregator: "aggregator", press_release: "press release", feed: "feed" };
+  const TABLE_PAGE = 25;
+  let META = null, runToken = 0, chart = null, tickTimer = null, lastRes = null;
+
+  // ---- DOM helpers: every piece of data goes in as a text node or a vetted attribute ----
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const kid of kids.flat(Infinity)) {
+      if (kid == null || kid === false) continue;
+      el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  }
+  function safeUrl(u) {
+    if (typeof u !== "string") return null;
+    try { const p = new URL(u); return (p.protocol === "http:" || p.protocol === "https:") ? p.href : null; }
+    catch (e) { return null; }
+  }
+  function link(url, text, cls) {
+    // articles open the corpus excerpt page served by this app (original + archived links are there),
+    // since many 2020 URLs no longer resolve
+    const u = safeUrl(url);
+    // pass the URL exactly as stored (not the browser-normalised form) so the server finds it
+    return u ? h("a", { href: "/article?url=" + encodeURIComponent(url), target: "_blank", rel: "noopener", class: cls,
+                        title: "Open the corpus excerpt (with original and archived links)" }, text)
+             : h("span", { class: cls }, text);
+  }
+  function pct(x) { return x == null ? "–" : Math.round(x * 100) + "%"; }
+  function ts(iso) { return Date.parse(String(iso).slice(0, 19) + "Z"); }  // corpus times are naive; keep them as-is
+  function fmtDate(iso, withTime = true, withYear = true) {
+    const t = ts(iso); if (isNaN(t)) return String(iso || "");
+    const d = new Date(t);
+    let s = d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + (withYear ? " " + d.getUTCFullYear() : "");
+    if (withTime) s += ", " + String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0");
+    return s;
+  }
+  // a date-only stamp is only known to the day: place it at the end of that day
+  function effTs(m) { const t = ts(m.date); return m.has_time ? t : t + 864e5 - 6e4; }
+  function orderedSpread(res) { return res.spread.map((m, i) => [effTs(m), i, m]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]); }
+  function fmtMention(m) { return m.has_time ? fmtDate(m.date) : fmtDate(m.date, false) + " (date only)"; }
+  function kindBadge(kind) { const k = KIND_LABEL[kind] ? kind : "outlet"; return h("span", { class: "kind k-" + k }, KIND_LABEL[k]); }
+  function fmtCount(n) { return n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 1 : 2).replace(/\.?0+$/, "") + "M" : n.toLocaleString("en"); }
+
+  // ---- meta / badge ----
+  async function loadMeta() {
+    try {
+      const r = await fetch("/api/meta", { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const m = await r.json();
+      const changed = META && META.config_version !== m.config_version;
+      META = m;
+      renderBadge(changed);
+      if (!$("#chips").childElementCount) renderExamples();
+      if (m.corpus) {
+        $("#coverage").textContent = "Covers " + fmtCount(m.corpus.n_mentions) + " mentions of " + fmtCount(m.corpus.n_quotes) +
+          " quotations in English-language news, " + fmtDate(m.corpus.start, false) + " – " + fmtDate(m.corpus.end, false) +
+          " (Quotebank). Works best with reported speech that names the speaker. “As of” limits the search to coverage published before that moment.";
+      }
+    } catch (e) {
+      $("#badge-text").textContent = "Tracer status unavailable";
+    }
+  }
+  function renderBadge(flash) {
+    const m = META, t = $("#badge-text");
+    t.replaceChildren(
+      h("b", null, "Tracer config v" + m.config_version), " · ",
+      h("b", null, pct(m.val_first_any)), " on held-out benchmark ",
+      h("span", { class: "sub" }, "(baseline " + pct(m.baseline_val_first_any) + ")"), " · tuned by a self-improving loop"
+    );
+    $("#badge").setAttribute("aria-label", t.textContent + ". Show the self-improvement loop.");
+    if (flash) { const b = $("#badge"); b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash"); }
+  }
+  function renderExamples() {
+    const box = $("#chips");
+    for (const ex of META.examples || []) {
+      box.append(h("button", {
+        type: "button", class: "chip", title: ex.statement,
+        onclick: () => { useExample(ex); run(); }
+      }, h("span", { class: "t" }, ex.topic), ex.label));
+    }
+  }
+  function useExample(ex) {
+    $("#statement").value = ex.statement;
+    $("#asof").value = ex.as_of.slice(0, 16);
+    updateCount();
+  }
+  function currentExample(statement, asof) {
+    if (!META) return null;
+    return (META.examples || []).find((e) => e.statement === statement && e.as_of.slice(0, 16) === String(asof).slice(0, 16)) || null;
+  }
+
+  // ---- input ----
+  function updateCount() {
+    const n = $("#statement").value.length, c = $("#count");
+    c.textContent = n + " / 500"; c.classList.toggle("over", n > 500);
+  }
+  $("#statement").addEventListener("input", updateCount);
+  $("#statement").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); run(); } });
+  $("#form").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+
+  // ---- run a trace ----
+  async function run() {
+    const statement = $("#statement").value.replace(/\s+/g, " ").trim();
+    let asof = $("#asof").value;
+    if (!statement) { showMessage("error", "Enter a statement first", ["Type or paste a sentence from a news story, or pick an example below."]); $("#statement").focus(); return; }
+    if (statement.length > 500) { showMessage("error", "That statement is too long", ["Keep it under 500 characters: one sentence of reported speech works best."]); return; }
+    const ex = currentExample(statement, asof);
+    if (ex) asof = ex.as_of;  // keep the benchmark's exact cut-off (seconds)
+    const token = ++runToken;
+    const params = new URLSearchParams({ q: statement }); if (asof) params.set("as_of", asof);
+    history.replaceState(null, "", "?" + params.toString() + location.hash);
+    $("#go").disabled = true;
+    $("#result").replaceChildren();
+    showProgress({ status: "queued", elapsed: 0 });
+    const t0 = performance.now();
+    clearInterval(tickTimer);
+    tickTimer = setInterval(() => { $("#elapsed").textContent = ((performance.now() - t0) / 1000).toFixed(1) + " s"; }, 100);
+    try {
+      const r = await fetch("/api/trace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ statement, as_of: asof || null }) });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error || ("HTTP " + r.status));
+      let job;
+      for (;;) {
+        if (token !== runToken) return;
+        const jr = await fetch("/api/job/" + encodeURIComponent(body.job_id), { cache: "no-store" });
+        job = await jr.json();
+        if (!jr.ok) throw new Error(job.error || ("HTTP " + jr.status));
+        if (token !== runToken) return;
+        showProgress(job);
+        if (job.status === "done" || job.status === "error") break;
+        await new Promise((res) => setTimeout(res, 600));
+      }
+      if (job.status === "error") throw new Error(job.error || "The trace failed.");
+      $("#progress").hidden = true;
+      renderResult(job.result, job.elapsed, ex);
+    } catch (e) {
+      if (token !== runToken) return;
+      $("#progress").hidden = true;
+      showMessage("error", "Something went wrong", [h("span", { class: "errtext" }, String(e.message || e))], ["Try again in a moment; if it keeps failing, try a shorter statement."]);
+    } finally {
+      if (token === runToken) { clearInterval(tickTimer); $("#go").disabled = false; }
+    }
+  }
+
+  function showProgress(job) {
+    const p = $("#progress"); p.hidden = false;
+    const order = ["search", "verify", "timeline"];
+    const idx = job.status === "queued" ? -1 : job.status === "done" ? 3 : Math.max(0, order.indexOf(job.stage || "search"));
+    $("#progress-title").textContent = job.status === "queued"
+      ? "Waiting for a free tracer" + (job.queue_position ? " (#" + job.queue_position + " in queue)" : "") + "…"
+      : job.status === "done" ? "Done" : "Tracing…";
+    document.querySelectorAll("#steps li").forEach((li, i) => {
+      li.classList.toggle("done", i < idx); li.classList.toggle("active", i === idx);
+      li.querySelector(".ic").textContent = i < idx ? "✓" : "";
+    });
+  }
+
+  function showMessage(kind, title, paras, tips) {
+    $("#result").replaceChildren(h("section", { class: "card message " + kind, role: kind === "error" ? "alert" : null },
+      h("h2", null, title),
+      (paras || []).map((p) => h("p", null, p)),
+      tips && tips.length ? h("ul", null, tips.map((t) => h("li", null, t))) : null));
+  }
+
+  // ---- results ----
+  function renderResult(res, elapsed, ex) {
+    const out = [];
+    if (!res.matched_quotes.length || !res.first_any) {
+      showMessage("empty", "No quotation in the corpus states this",
+        [res.n_candidates ? "We searched " + res.n_candidates + " similar quotations, and Claude found none that says this." : "No similar quotations were found."],
+        ["Phrase it as reported speech that names the speaker, e.g. “Angela Merkel said the virus would infect most Germans”.",
+         "The corpus only covers news quotations from 1 Jan to 17 Apr 2020: later events will not be found.",
+         "If you set an “as of” time, the quotation must have been published before it.",
+         "Keep to one claim per trace; long compound statements are harder to match."]);
+      $("#result").append(howCard(res, elapsed));
+      return;
+    }
+    lastRes = res;
+    out.push(quotesSection(res));
+    out.push(headlineCards(res, ex));
+    out.push(spreadCard(res));
+    out.push(howCard(res, elapsed));
+    $("#result").replaceChildren(...out);
+    drawChart(res);
+  }
+
+  function quoteCard(q) {
+    return h("article", { class: "card quote-card" },
+      h("p", { class: "quote-text" }, q.text),
+      h("div", { class: "quote-meta" },
+        h("span", null, "Speaker: ", h("b", null, q.speaker && q.speaker !== "None" ? q.speaker : "unattributed")),
+        h("span", null, "First seen: ", h("b", null, /T00:00/.test(q.date) ? fmtDate(q.date, false) : fmtDate(q.date))),
+        h("span", null, "Carried by " + q.num_urls + " article" + (q.num_urls === 1 ? "" : "s"))));
+  }
+  function quotesSection(res) {
+    const qs = res.matched_quotes.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+    const sec = h("section", { "aria-labelledby": "mq-h" },
+      h("h2", { class: "section-title", id: "mq-h" }, qs.length === 1 ? "Matched quotation" : "Matched quotations (" + qs.length + " versions)"));
+    sec.append(quoteCard(qs[0]));
+    if (qs.length > 1) {
+      const rest = h("div", { hidden: true }, qs.slice(1).map(quoteCard));
+      const btn = h("button", { type: "button", class: "more-quotes", "aria-expanded": "false",
+        onclick: () => { rest.hidden = !rest.hidden; btn.setAttribute("aria-expanded", String(!rest.hidden)); btn.textContent = rest.hidden ? "Show " + (qs.length - 1) + " more version" + (qs.length > 2 ? "s" : "") : "Hide other versions"; } },
+        "Show " + (qs.length - 1) + " more version" + (qs.length > 2 ? "s" : ""));
+      sec.append(btn, rest);
+    }
+    return sec;
+  }
+
+  function benchLine(res, ex) {
+    if (!ex || !ex.benchmark || !ex.benchmark.date) return null;
+    const b = ex.benchmark, p = res.first_any;
+    const ok = p && (p.url === b.url || String(p.date).slice(0, 19) === String(b.date).slice(0, 19));
+    return h("div", { class: "bench" + (ok ? " ok" : "") },
+      ok ? h("b", null, "✓ Matches the benchmark answer. ") : h("b", null, "Benchmark answer: "),
+      ok ? "This held-out example’s ground truth is " : "", b.domain, ", " + fmtDate(b.date) + ".");
+  }
+
+  function headlineCards(res, ex) {
+    const fa = res.first_any, fo = res.first_original;
+    const first = h("article", { class: "card hl" },
+      h("div", { class: "kicker" }, "First appeared"),
+      h("div", { class: "outlet" }, fa.domain),
+      h("div", { class: "when" }, fmtMention(fa), " · ", kindBadge(fa.kind)),
+      h("p", { class: "title" }, link(fa.url, fa.title || fa.url)),
+      benchLine(res, ex));
+    let second;
+    if (fo && fo.url === fa.url) {
+      second = h("article", { class: "card hl orig" },
+        h("div", { class: "kicker" }, "First original outlet"),
+        h("div", { class: "outlet" }, "Same outlet"),
+        h("p", { class: "explain" }, fa.domain + " is itself an original outlet, so the earliest source we can see is also the first newsroom to carry the quote."),
+        h("p", { class: "explain" }, "Wires (AP, Reuters, AFP…), aggregators, press-release services and feeds mostly republish others’ reporting, so they are skipped when looking for the original outlet."));
+    } else if (fo) {
+      second = h("article", { class: "card hl orig" },
+        h("div", { class: "kicker" }, "First original outlet"),
+        h("div", { class: "outlet" }, fo.domain),
+        h("div", { class: "when" }, fmtMention(fo), " · ", kindBadge(fo.kind)),
+        h("p", { class: "title" }, link(fo.url, fo.title || fo.url)),
+        h("p", { class: "explain" }, "The first appearance was on a " + (KIND_LABEL[fa.kind] || fa.kind) +
+          " site. Wires (AP, Reuters, AFP…), aggregators, press-release services and feeds mostly republish others’ reporting, so this is the first outlet that is not one of those."));
+    } else {
+      second = h("article", { class: "card hl orig" },
+        h("div", { class: "kicker" }, "First original outlet"),
+        h("div", { class: "outlet" }, "None found"),
+        h("p", { class: "explain" }, "Every mention we have is on a wire, aggregator, press-release or feed site, which mostly republish others’ reporting."));
+    }
+    return h("section", { class: "headline-cards", "aria-label": "Where it started" }, first, second);
+  }
+
+  function spreadCard(res) {
+    const sp = orderedSpread(res);
+    const span = sp.length > 1 ? effTs(sp[sp.length - 1]) - effTs(sp[0]) : 0;
+    const days = span / 864e5;
+    const spanTxt = sp.length < 2 ? "" : days < 2 ? (span < 36e5 ? " within an hour" : " within " + Math.round(span / 36e5) + " hours") : " over " + Math.round(days) + " days";
+    const card = h("section", { class: "card spread-card", "aria-labelledby": "sp-h" },
+      h("div", { class: "spread-head" },
+        h("h2", { class: "section-title", id: "sp-h", style: "margin:0" }, "How it spread"),
+        h("div", { class: "big" }, h("b", null, String(res.n_outlets)), " outlet" + (res.n_outlets === 1 ? "" : "s") + spanTxt + " · " + res.n_mentions + " mention" + (res.n_mentions === 1 ? "" : "s"))),
+      h("div", { class: "legend", "aria-hidden": "true" },
+        h("span", null, h("i", { style: "background:var(--series)" }), "Outlets carrying the quote (cumulative)"),
+        h("span", null, h("i", { style: "background:var(--first)" }), "First appearance"),
+        res.first_original && res.first_original.url !== res.first_any.url ? h("span", null, h("i", { style: "background:var(--orig)" }), "First original outlet") : null,
+        sp.some((m) => !m.has_time) ? h("span", null, "Date-only stamps are placed at the end of their day") : null),
+      h("div", { class: "chart-box" }, h("canvas", { id: "chart", role: "img", "aria-label": "Cumulative number of outlets carrying the quotation over time; the table below lists every outlet." })));
+    const tbody = h("tbody");
+    const table = h("table", null,
+      h("caption", { class: "sr-only" }, "First mention of the quotation per outlet, in time order"),
+      h("thead", null, h("tr", null, h("th", { scope: "col" }, "Time"), h("th", { scope: "col" }, "Outlet"), h("th", { scope: "col" }, "Kind"), h("th", { scope: "col" }, "Headline"))),
+      tbody);
+    const fill = (n) => {
+      tbody.replaceChildren(...sp.slice(0, n).map((m) => {
+        const isFirst = res.first_any && m.url === res.first_any.url;
+        const isOrig = !isFirst && res.first_original && m.url === res.first_original.url;
+        return h("tr", { class: isFirst ? "is-first" : isOrig ? "is-orig" : null },
+          h("td", { class: "time" }, m.has_time ? fmtDate(m.date) : [fmtDate(m.date, false), h("br"), h("span", { class: "dateonly" }, "date only")]),
+          h("td", { class: "outlet" }, m.domain, isFirst ? h("span", { class: "tag first" }, "first") : null, isOrig ? h("span", { class: "tag orig" }, "first original") : null),
+          h("td", null, kindBadge(m.kind)),
+          h("td", { class: "headline" }, link(m.url, m.title || m.url)));
+      }));
+    };
+    fill(TABLE_PAGE);
+    card.append(h("div", { class: "table-wrap" }, table));
+    if (sp.length > TABLE_PAGE) {
+      const btn = h("button", { type: "button", class: "show-all", onclick: () => {
+        const all = btn.dataset.all !== "1"; fill(all ? sp.length : TABLE_PAGE);
+        btn.dataset.all = all ? "1" : "0"; btn.textContent = all ? "Show first " + TABLE_PAGE : "Show all " + sp.length + " outlets";
+      } }, "Show all " + sp.length + " outlets");
+      card.append(btn);
+    }
+    return card;
+  }
+
+  function howCard(res, elapsed) {
+    const c = res.llm_calls || { made: 0, cached: 0 };
+    return h("section", { class: "card how", "aria-label": "How it was traced" },
+      h("strong", null, "How it was traced"),
+      h("ol", null,
+        h("li", null, "Full-text search (BM25) over 5.2M unique quotations found " + res.n_candidates + " candidates first seen before " + fmtDate(res.as_of) + "."),
+        h("li", null, "Claude Haiku judged which candidates state your claim: " + res.matched_quotes.length + " matched (" + c.made + " new call" + (c.made === 1 ? "" : "s") + ", " + c.cached + " from cache)."),
+        h("li", null, "Every mention of the matched quotations gave the timeline: " + res.n_mentions + " mentions across " + res.n_outlets + " outlets.")),
+      h("div", { class: "cfg" }, "Tracer config v" + res.config.version + " (", h("code", null, res.config.hash), ") · " +
+        (res.app_cache ? "instant repeat (cached result, originally " + res.trace_seconds + " s)" : "took " + (elapsed != null ? elapsed : res.trace_seconds) + " s")));
+  }
+
+  // ---- chart ----
+  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function pickStep(span) {
+    const H = 36e5, D = 864e5;
+    const steps = [H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D, 14 * D, 28 * D];
+    return steps.find((s) => span / s <= 7) || 28 * D;
+  }
+  function drawChart(res) {
+    const canvas = document.getElementById("chart");
+    if (!canvas) return;
+    if (chart) { chart.destroy(); chart = null; }
+    if (typeof Chart === "undefined") {
+      canvas.parentNode.replaceChildren(h("div", { class: "chart-fallback" }, "Chart unavailable (Chart.js could not load); the table below lists every outlet."));
+      return;
+    }
+    const sp = orderedSpread(res);
+    const pts = sp.map((m, i) => ({ x: effTs(m), y: i + 1, m }));
+    const t0 = pts[0].x, t1 = pts[pts.length - 1].x;
+    const step = pickStep(Math.max(t1 - t0, 36e5));
+    const min = Math.floor(t0 / step) * step, max = Math.max(Math.ceil(t1 / step) * step, min + step);
+    const series = cssVar("--series"), first = cssVar("--first"), orig = cssVar("--orig"), surface = cssVar("--surface");
+    const faUrl = res.first_any && res.first_any.url, foUrl = res.first_original && res.first_original.url;
+    const role = (p) => p.m.url === faUrl ? "first" : (p.m.url === foUrl ? "orig" : "");
+    const showHours = step < 864e5;
+    const fmtTick = (v) => { const d = new Date(v); const day = d.getUTCDate() + " " + MONTHS[d.getUTCMonth()];
+      return showHours ? (d.getUTCHours() === 0 ? [day, "00:00"] : String(d.getUTCHours()).padStart(2, "0") + ":00") : day; };
+    chart = new Chart(canvas, {
+      type: "line",
+      data: { datasets: [{
+        data: pts, parsing: false, stepped: "before", borderColor: series, borderWidth: 2, fill: true,
+        backgroundColor: cssVar("--series-fill"),
+        pointRadius: pts.map((p) => role(p) ? 6 : (pts.length <= 40 ? 2.5 : 0)),
+        pointHoverRadius: pts.map((p) => role(p) ? 8 : 5),
+        pointBackgroundColor: pts.map((p) => role(p) === "first" ? first : role(p) === "orig" ? orig : series),
+        pointBorderColor: surface, pointBorderWidth: pts.map((p) => role(p) ? 2 : 0),
+      }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+        interaction: { mode: "nearest", axis: "x", intersect: false },
+        layout: { padding: { top: 8, right: 8 } },
+        scales: {
+          x: { type: "linear", min, max, ticks: { stepSize: step, color: cssVar("--muted"), autoSkip: true, maxRotation: 0, callback: fmtTick, font: { size: 11 } },
+               grid: { color: cssVar("--grid") }, border: { color: cssVar("--border") } },
+          y: { beginAtZero: true, ticks: { precision: 0, color: cssVar("--muted"), font: { size: 11 } },
+               grid: { color: cssVar("--grid") }, border: { display: false },
+               title: { display: true, text: "Outlets", color: cssVar("--muted"), font: { size: 11 } } },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: cssVar("--surface"), titleColor: cssVar("--text"), bodyColor: cssVar("--text-2"),
+            borderColor: cssVar("--border"), borderWidth: 1, padding: 10, displayColors: false,
+            callbacks: {
+              title: (items) => items.length ? items[0].raw.m.domain : "",
+              label: (item) => {
+                const p = item.raw, r = role(p);
+                return [fmtMention(p.m) + " · " + (KIND_LABEL[p.m.kind] || p.m.kind),
+                        p.y + " outlet" + (p.y === 1 ? "" : "s") + " so far" + (r === "first" ? " · first appearance" : r === "orig" ? " · first original outlet" : "")];
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // ---- init ----
+  loadMeta().then(() => {
+    const q = new URLSearchParams(location.search);
+    if (q.get("q")) {
+      $("#statement").value = q.get("q").slice(0, 500);
+      const a = q.get("as_of"); if (a && /^\d{4}-\d{2}-\d{2}/.test(a)) $("#asof").value = a.slice(0, 16);
+      updateCount(); run();
+    }
+  });
+  setInterval(loadMeta, 30000);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (chart && lastRes) drawChart(lastRes); });
+})();
+</script>
+<script>
+"use strict";
+// ---- app shell: #trace / #loop tabs; the dashboard frame loads on first view and then stays alive ----
+(function () {
+  const tabs = Array.from(document.querySelectorAll('#tabs [role="tab"]'));
+  const panel = { trace: document.getElementById("panel-trace"), loop: document.getElementById("panel-loop") };
+  const TITLES = { trace: "Firstline", loop: "Self-improvement loop · Firstline" };
+  let frame = null, current = null;
+
+  // "#loop" or "#loop/ls-fit" (the part after the slash is passed on as the dashboard's own hash)
+  function parse(hash) {
+    const m = /^#(trace|loop)(?:\/([\w-]+))?$/.exec(hash || "");
+    return m ? { view: m[1], sub: m[2] || "" } : { view: "trace", sub: "" };
+  }
+  function ensureFrame(sub) {
+    if (frame) return;
+    frame = document.createElement("iframe");
+    frame.title = "Self-improvement loop dashboard";
+    frame.addEventListener("load", () => { frame.classList.add("loaded"); document.getElementById("frame-wait").hidden = true; });
+    frame.src = "/dash/" + (sub ? "#" + sub : "");
+    panel.loop.append(frame);
+  }
+  function show(view, sub, focusTab) {
+    if (view === "loop") ensureFrame(sub);
+    if (view === current) return;
+    current = view;
+    for (const t of tabs) {
+      const on = t.dataset.view === view;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focusTab) t.focus();
+    }
+    panel.trace.hidden = view !== "trace";
+    panel.loop.classList.toggle("active", view === "loop");
+    panel.loop.setAttribute("aria-hidden", String(view !== "loop"));
+    document.getElementById("standalone").hidden = view !== "loop";
+    document.title = TITLES[view];
+    if (view === "trace") window.dispatchEvent(new Event("resize"));  // let Chart.js re-measure after display:none
+  }
+  function go(view) {
+    if (parse(location.hash).view === view && location.hash) return show(view, "", false);
+    location.hash = view;  // -> hashchange -> show(); back/forward switch tabs too
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => go(t.dataset.view));
+    t.addEventListener("keydown", (e) => {
+      let j = null;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % tabs.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = tabs.length - 1;
+      if (j === null) return;
+      e.preventDefault();
+      tabs[j].focus();
+      go(tabs[j].dataset.view);
+    });
+  });
+  window.addEventListener("hashchange", () => {
+    const r = parse(location.hash);
+    const fromTab = tabs.includes(document.activeElement);
+    show(r.view, r.sub, !fromTab);  // e.g. the header badge: move focus to the tab it opened
+  });
+  const r = parse(location.hash);
+  show(r.view, r.sub, false);
+})();
+</script>
+</body>
+</html>

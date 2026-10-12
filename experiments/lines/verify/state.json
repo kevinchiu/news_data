@@ -1,46 +1,47 @@
 {
-  "threshold": 3,
+  "threshold": 4,
   "noise": {
-    "flips": 2,
-    "fixed": 1,
-    "broken": 1,
-    "n": 60
+    "flips": 5,
+    "fixed": 2,
+    "broken": 3,
+    "n": 145
   },
   "baseline_test": {
     "n": 146,
     "recall_at_k": 0.773972602739726,
     "verifier_recall": 1.0,
-    "fp_earlier": 0.0958904109589041,
+    "fp_earlier": 0.07534246575342465,
     "first_any": 0.7054794520547946,
-    "first_any_tie": 0.03424657534246575,
-    "first_original": 0.678082191780822,
+    "first_any_tie": 0.0410958904109589,
+    "first_original": 0.6643835616438356,
     "calls_per_claim": 2.0,
-    "new_calls": 202
+    "new_calls": 0
   },
   "best_version": 1,
   "best_config": "experiments/lines/verify/configs/v1.json",
-  "round": 5,
+  "round": 8,
   "train_metrics": {
-    "n": 60,
-    "recall_at_k": 0.75,
+    "n": 145,
+    "recall_at_k": 0.696551724137931,
     "verifier_recall": 1.0,
-    "fp_earlier": 0.11666666666666667,
-    "first_any": 0.65,
-    "first_any_tie": 0.08333333333333333,
-    "first_original": 0.5666666666666667,
+    "fp_earlier": 0.07586206896551724,
+    "first_any": 0.6413793103448275,
+    "first_any_tie": 0.041379310344827586,
+    "first_original": 0.6,
     "calls_per_claim": 2.0,
-    "new_calls": 97
+    "new_calls": 170
   },
   "val_metrics": {
     "n": 73,
     "recall_at_k": 0.7397260273972602,
     "verifier_recall": 1.0,
-    "fp_earlier": 0.0958904109589041,
-    "first_any": 0.6575342465753424,
+    "fp_earlier": 0.0684931506849315,
+    "first_any": 0.684931506849315,
     "first_any_tie": 0.0958904109589041,
-    "first_original": 0.5616438356164384,
+    "first_original": 0.589041095890411,
     "calls_per_claim": 2.0,
-    "new_calls": 146
+    "new_calls": 0
   },
-  "focus": "verify"
+  "focus": "verify",
+  "gt_version": 2
 }

@@ -1,0 +1,29 @@
+{
+  "retrieval": {
+    "k": 30,
+    "index": "quotation",
+    "query_template": "raw",
+    "speaker_filter": "off",
+    "min_urls": 1,
+    "window_days": null
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "You check whether quotations from news coverage state the same fact as a claim.\n\nEach candidate is a quotation with its attributed speaker and the date it was first seen. A candidate MATCHES if the speaker, in that quotation, asserts the claim's central fact or statement: same event, action, figure or position, with no conflicting key details. The claim may paraphrase or summarise the quotation, or cover only part of it. Speaker attributions are automatic and sometimes wrong or missing (\"None\"); judge mainly by content, but a clearly different speaker making a similar statement does NOT match.\n\nA candidate does NOT match if it is only on the same topic, makes a different or opposite point, concerns a different event, period or figure, or is a generic remark the claim does not report.\n\nReturn the ids of all matching candidates (an empty list if none).",
+    "show_date": true,
+    "speaker_hint": false,
+    "show_num_urls": false
+  },
+  "timeline": {
+    "variants": "direct",
+    "original_excludes": [
+      "wire",
+      "press_release",
+      "aggregator",
+      "feed"
+    ]
+  },
+  "domain_overrides": []
+}
