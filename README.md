@@ -145,6 +145,11 @@ prompts that add names/numbers from train/val items are rejected.
 6. **Loop improvements.** Self-generated harder benchmark items when train saturates; a GEPA
    comparison. (Borderline second look: done.)
 
+## Licence
+
+This project's code is released under the MIT License (see `LICENSE`). Slides in
+`docs/slides/` are © their authors.
+
 ## Licences of what we use
 
 No datasets are stored in this repo; `scripts/get_data.py` downloads them from their sources.
@@ -163,4 +168,3 @@ No datasets are stored in this repo; `scripts/get_data.py` downloads them from t
 | Chart.js 4.4.1, Plotly.js 2.35.2 (loaded from jsDelivr) | MIT |
 | Claude models via Claude Code | Anthropic's terms of service |
 
-Slides in `docs/slides/` are © their authors.
