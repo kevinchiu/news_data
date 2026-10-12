@@ -8,14 +8,14 @@ cached in `data/cache/llm.sqlite`, so re-runs are free.
 
 ## Presentation
 
-*Who said it first?* is a 9-slide deck covering the problem, the data, the tracer, the
-self-improvement loop and where this leads.
+*Who said it first?* is a 10-slide deck covering the problem, the data, the tracer, the
+self-improvement loop (with a dashboard screenshot) and where this leads.
 
 - [PDF](docs/slides/who-said-it-first.pdf) (GitHub shows it inline)
 - [HTML](docs/slides/who-said-it-first.html): open it locally and use ← → to move between slides.
 
-The figures come from the 2026-10-11 run (`experiments/state.json`). The locked test set hasn't
-been scored again yet. Prepared by Aleks Jakulin (data.Flowers) with Kevin Chiu (Plastachio) at an
+The figures come from the dashboard at 5:20 PM on 2026-10-11 (round 9 of the all-knobs line). The
+locked test set hasn't been scored again yet. Prepared by Aleks Jakulin (data.Flowers) with Kevin Chiu (Plastachio) at an
 RSIHOUSE × Sundai Club hack.
 
 ## Setup
