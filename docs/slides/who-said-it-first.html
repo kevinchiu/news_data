@@ -313,6 +313,15 @@ svg.mini{width:100%;max-width:400px;height:auto}
 .co .mark{width:30px;height:30px}
 .co .pl-mark{width:30px;height:30px}
 
+/* dashboard screenshot */
+.shot{margin:0;padding:14px 16px 16px;border-radius:10px;background:#141414;display:grid;gap:8px}
+.shot .label{color:#bdb7a6}
+.shot img{display:block;width:100%;height:auto;border-radius:6px}
+.kpi{display:grid;gap:2px;padding-top:10px;border-top:2px dashed var(--rule)}
+.kpi b{font-family:var(--serif);font-weight:400;font-size:42px;line-height:1.05}
+.kpi .from{color:var(--ink-2);font-size:28px}
+.kpi > span{font-size:18px;color:var(--ink-2)}
+
 /* uses and next steps */
 .nexts{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:nx}
 .nexts li{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;padding-top:9px;border-top:2px dashed var(--rule);font-size:21px;line-height:1.4;counter-increment:nx}
@@ -393,7 +402,7 @@ svg.mini{width:100%;max-width:400px;height:auto}
     <div class="cols rule-top" style="grid-template-columns:repeat(3,1fr);align-content:start">
       <p><span class="label mag">The problem</span>Our model of reality is built from retold text. Quotes get trimmed, reworded and credited to the wrong person, and AI models learn the drifted version.</p>
       <p><span class="label">What we built</span>A tracer over four months of news: about 4 million articles, January to April 2020. Give it “X said that…”; it finds the quotes that say it and the earliest article that carried them.</p>
-      <p><span class="label">How it improves</span>A stronger AI model studies the tracer's mistakes and suggests small fixes. Three fixes passed, and on questions it never studied, correct first reports rose from 60% to 86%.</p>
+      <p><span class="label">How it improves</span>A stronger AI model studies the tracer's mistakes and suggests small fixes. Three fixes passed, and on questions it never studied, correct first reports rose from 60% to 85%.</p>
     </div>
     <div class="cta"><span class="label">Where it leads</span><p>News is the simple case. Next: the origins of ideas and inventions, as long as they are shared in the open.</p></div>
   </div>
@@ -541,13 +550,37 @@ svg.mini{width:100%;max-width:400px;height:auto}
         </dl>
       </div>
     </div>
-    <div class="sets" role="img" aria-label="Share of statements whose true first report was found. Practice set, 145 statements: 58% at the start, 88% now. Second set, 73 statements: 60% at the start, 86% now. Final set, 146 statements, locked: 71% at the start; scored again only at the end.">
-      <div class="set"><span class="label">Practice set · 145</span><p>The stronger model studies mistakes here.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:58%"></span></span><b>58%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:88%"></span></span><b>88%</b></div></div>
-      <div class="set two"><span class="label">Second set · 73</span><p>Never studied; a change that does worse here is dropped.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:60%"></span></span><b>60%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:86%"></span></span><b>86%</b></div></div>
+    <div class="sets" role="img" aria-label="Share of statements whose true first report was found. Practice set, 145 statements: 58% at the start, 83% now. Second set, 73 statements: 60% at the start, 85% now. Final set, 146 statements, locked: 71% at the start; scored again only at the end.">
+      <div class="set"><span class="label">Practice set · 145</span><p>The stronger model studies mistakes here.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:58%"></span></span><b>58%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:83%"></span></span><b>83%</b></div></div>
+      <div class="set two"><span class="label">Second set · 73</span><p>Never studied; a change that does worse here is dropped.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:60%"></span></span><b>60%</b><span class="k">now</span><span class="track"><span class="fill now" style="width:85%"></span></span><b>85%</b></div></div>
       <div class="set lock"><span class="label"><svg width="14" height="17" viewBox="0 0 14 17" aria-hidden="true" style="display:inline;vertical-align:-2px;margin-right:8px;overflow:visible"><path d="M3.5 8V5.5a3.5 3.5 0 0 1 7 0V8" style="fill:none;stroke:var(--lime);stroke-width:2"/><rect x="0.5" y="8" width="13" height="9" rx="1.5" style="fill:var(--lime)"/></svg>Final set · 146 · locked</span><p>Scored once at the start, once at the very end.</p><div class="res"><span class="k">start</span><span class="track"><span class="fill" style="width:71%"></span></span><b>71%</b><span class="k">end</span><span class="pending">scored at the very end</span></div></div>
     </div>
   </div>
-  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><i class="pl-mark" aria-hidden="true"></i>data.Flowers × Plastachio · Bars: first report found, at the start vs. after 8 rounds (3 changes kept) · Improver: Claude Opus 5.5</span><span class="num"></span></footer>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><i class="pl-mark" aria-hidden="true"></i>data.Flowers × Plastachio · Bars: first report found, at the start vs. round 9 (3 changes kept) · Improver: Claude Opus 5.5</span><span class="num"></span></footer>
+</section>
+
+<!-- 6b · The loop at work: dashboard -->
+<section class="slide" aria-label="The loop at work">
+  <header class="s-head"><span class="eyebrow">The loop at work</span><span>Live dashboard · round 9</span></header>
+  <div class="s-body" style="grid-template-rows:auto 1fr;gap:24px">
+    <h2 style="font-size:54px">The gains held on statements the loop never <span class="serif-i hl">saw</span></h2>
+    <div style="display:grid;grid-template-columns:840px 1fr;gap:56px;align-items:start">
+      <figure class="shot">
+        <span class="label">Second set · first report found, by round</span>
+        <img src="img/dashboard-val.webp" width="1960" height="570" alt="Dashboard chart of validation accuracy by round for three lines. All knobs climbs from 60% to about 85% by round 2 and holds through round 8; retrieval only levels at about 71%; checker only at about 66%.">
+        <span class="label">Watch set · 100 statements the loop never reads</span>
+        <img src="img/dashboard-watch.webp" width="1960" height="480" alt="Dashboard chart of watch-set accuracy by round. All knobs rises from 60% to 85% by round 3 and holds to round 9; retrieval only reaches 72%; checker only 65%.">
+      </figure>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="kpi"><b><span class="from">60%</span> → 85%</b><span>Watch set: 100 statements, never read by the loop</span></div>
+        <div class="kpi"><b><span class="from">60%</span> → 85%</b><span>Second set: 73 statements, never studied</span></div>
+        <div class="kpi"><b><span class="from">58%</span> → 83%</b><span>Practice set: 145 statements</span></div>
+        <div class="kpi"><b>3 <span class="from">kept</span> · 16 <span class="from">dropped</span></b><span>Changes the stronger model proposed</span></div>
+        <p class="src-p" style="padding-top:12px;border-top:2px dashed var(--rule)">Three lines ran in parallel. Tuning everything at once (<b style="color:#3b82f6">blue</b>) beat tuning only the shortlist (<b style="color:#e8622c">orange</b>, 74%) or only the checker (<b style="color:#1aa37a">green</b>, 68%).</p>
+      </div>
+    </div>
+  </div>
+  <footer class="s-foot"><span class="brand"><svg class="mark" aria-hidden="true"><use href="#df-flower"/></svg><i class="pl-mark" aria-hidden="true"></i>data.Flowers × Plastachio · Screenshot of scripts/dashboard.py, 11 Oct 2026, 5:20 PM · step line = best so far · ▲ kept · ○ dropped</span><span class="num"></span></footer>
 </section>
 
 <!-- 7 · Implications: beyond the news, and the commons -->
