@@ -44,6 +44,20 @@ validation, and search recall tops out at 47.6% (exhaustive sweep) — the obvio
 
 ## Running the demo
 
+**Offline demo: [docs/demo/demo.html](docs/demo/demo.html).** One self-contained page (no server, no
+model calls) in the style of the Firstline app, with 80 precomputed traces from the held-out sets (40
+quotes, 40 events): search or pick an example to see the tracer's first report, the benchmark answer
+and how the story spread. Download it and open it in a browser (GitHub shows HTML as source). Its
+event examples use the post-loop fixed tracer. Rebuild:
+
+```
+.venv/bin/python -I scripts/build_demo.py      # docs/demo/index.html: longer write-up, loop's final settings
+.venv/bin/python -I scripts/build_demo.py --event-best experiments_event/configs/fix_retrieval.json --out /tmp/demo_fix
+.venv/bin/python -I scripts/build_firstline_offline.py --source /tmp/demo_fix/index.html   # docs/demo/demo.html
+```
+
+Live app (needs the local database):
+
 ```
 .venv/bin/python -I scripts/dashboard.py                   # loop dashboard on 127.0.0.1:8765
 .venv/bin/python -I scripts/app.py --host 0.0.0.0          # Firstline app on :8780, dashboard tab proxied in
@@ -74,7 +88,11 @@ Claude Code (`claude -p`), so a logged-in Claude Code install is required to run
 | Quote variants | 8-gram links between trimmed/edited versions of a quote | `quote_links`, `quote_clusters` |
 | Domain labels | hand-curated wire / press_release / aggregator / feed + ownership groups | `data/domain_labels.csv` → `domains` view |
 | Reuters-21578 (1987) | dev set only (single outlet, too old/narrow); its text is not redistributed here — `scripts/make_bench.py` rebuilds the early dev benchmark locally | `reuters_*` tables |
+| GDELT 2.0 Events / Mentions / GKG 2.1 (Jan–Apr 2020, raw zips in `data/raw/gdelt/`) | 17.2M events, 55.0M mentions (with GDELT crawl time), 20.5M GKG article records (headline, persons, organisations, themes) | `gdelt_events`, `gdelt_mentions`, `gdelt_gkg`; headline index `gkg_titles` |
 | GDELT GKG wire rows (Jan–Apr 2020, all 11,615 files fetched) | AP/Reuters/AFP/… articles with GDELT-extracted quotes | `gdelt_wire_articles`, `wire_quote_matches` (not used by the tracer by default) |
+
+GDELT: `scripts/fetch_gdelt_raw.py` (manifest + resumable MD5-checked download),
+`scripts/load_gdelt_events.py`, `scripts/load_gdelt_gkg.py`, then `scripts/trace_event.py --build-index`.
 
 Rebuild: `scripts/parse_quotebank_quotes.py`, `scripts/parse_quotebank_parallel.py`,
 `scripts/build_db.py`, `scripts/quote_variants.py`.
@@ -118,6 +136,66 @@ Anti-gaming choices: the loop cannot change the outlet-count filter, time window
 expansion or domain labels (they leak how the benchmark is built or feed the ground truth), and
 prompts that add names/numbers from train/val items are rejected.
 
+## Event tracer (post-hackathon, GDELT)
+
+The same idea for events rather than quotes: given a sentence reporting an event and a time,
+find the first article that reported it. `scripts/trace_event.py "sentence" --as-of <ISO time>
+[--config experiments_event/configs/final.json]`: BM25 over GDELT headlines from the 7 days
+before `--as-of` (syndicated copies grouped by normalised headline), Haiku 5.5 picks the headlines
+reporting the same event, and the earliest matched article is the first report. Times are when
+GDELT saw the article (15-minute steps), an upper bound on publication.
+
+**Benchmark** (`bench/ev_bench.jsonl` train 130 / val 63 / test 130; `bench/ev_watch.jsonl` 88):
+items start from GDELT events reported by many outlets (`scripts/make_event_bench.py`); the query
+is a later outlet's report. Structural ground truth (GDELT event ids + shared headlines) failed an
+Opus audit (precision 0.76–0.82, ~half the earlier reports missed), so the labels are model-made:
+`scripts/label_event_gt.py` (Claude Sonnet 5.5, low effort, 8 items per call) judges candidates
+from the structure, IDF headline search, BM25 and GKG person/organisation matches, and keeps only
+discrete events. A label can only be as early as its candidates, so `scripts/adjudicate_event_gt.py`
+lets the same labeller judge tracer predictions that come out earlier than the label: v3.2 used the
+baseline's, v3.3 those of every config the loop scored in full (35 of 112 accepted). An independent
+Fable audit of 50 v3.3 adjudications agreed on 45 (accepted precision ~89%). Correct = an article
+of the first wave (the first report and same-event articles up to 30 minutes after it).
+Scoring: `scripts/evaluate_event.py`; loop: `improve.py ... --task event` (`experiments_event/`).
+
+**Results** (ground truth v3.4; Haiku 5.5 verifier, Opus 5.5 improver):
+
+| Split | Baseline (k 30, pool 4) | Loop final (k 60, pool 8) | + fixes (headline query) |
+|---|---|---|---|
+| Train (130) | 0.485 | 0.585 | 0.646 |
+| Validation (63) | 0.492 | 0.540 | 0.667 |
+| Watch (88) | 0.500 | 0.557 | 0.625 |
+| **Test (130, scored once per config)** | **0.492** | **0.608** | **0.662** (95% CI 0.58–0.74; vs baseline 28 fixed, 6 broken) |
+
+The loop (two lines: all knobs, stopped at round 3 on its Haiku budget; retrieval only, 10 rounds)
+accepted one change (k 30→50, pool 4→6). After v3.3 every scored config was re-scored on train/val
+and the best (k 60, pool 8, rejected at +2 before) became the loop's final config — a pick among 18
+configs; test was not used to choose. Inspecting held-out misses then showed three problems, fixed
+by hand (`experiments_event/configs/fix_*.json`, logged as a "fix" entry in the ledger):
+1. **Scoring:** same-event answers inside the 30-minute first wave that the labeller had never seen
+   were scored "late"; v3.4 sends those to the labeller too (all configs' answers, symmetrically).
+2. **Search:** reworded statements drift from headline vocabulary (the B.C. "eight fresh infections"
+   statement ranked the true "Eight new COVID-19 cases" headline ~2,000th). `query_template
+   "raw+headline"` adds a Haiku headline rewrite of the statement and interleaves both searches:
+   recall@k 0.79 → 0.88 on train, 0.71 → 0.87 on val, at the same ~4 Haiku calls per item.
+3. **Checker:** it accepts earlier occurrences of recurring events ("8th case" for "eight new cases").
+   A stricter prompt plus the claim's own time (`verify_event_v2.txt`, `show_claim_date`) cut early
+   answers but lost more true matches; it was not kept (train+val: 115 vs 126 for the search fix alone).
+
+The fixes were motivated by held-out examples, so the test number above is less clean than a
+loop-only result.
+
+Tried afterwards and not kept (train+val only, test not scored):
+- **Local models instead of Haiku.** Classifiers on TF-IDF, number-mismatch, timing and `bge-base`
+  embedding features, with or without Haiku's verdict, and local LLMs (Qwen2.5-14B,
+  Qwen3-Next-80B via MLX) as the checker all did worse than Haiku (val 19–40 of 63 vs 41): they
+  accept on-topic earlier occurrences, which are most of the remaining errors.
+- **An anchored second check** (`recheck` in `trace_event.py`, `experiments_event/configs/recheck_*.json`):
+  re-ask Haiku about candidates seen before reference headlines taken from the first check's
+  matches. Best variant 126 vs 123 of 193 (labels v3.5: its new early answers adjudicated, 3 of 8
+  accepts reverted after a Fable audit), 9 fixed / 6 broken, for ~3 more Haiku calls per item —
+  within noise. Labels are model-made (~10% disagreement with an independent audit).
+
 ## Backlog (not built yet)
 
 1. **Wire and press-release copy detection from shared text.** Quotebank keeps ~500 characters
@@ -135,10 +213,12 @@ prompts that add names/numbers from train/val items are rejected.
    a simple "who carries it within 24h after whom, with shared text" table is the first step.
 3. **GDELT wire matching (built, switched off).** `scripts/fetch_gdelt_wire.py` streams GDELT 2.1
    GKG files and keeps wire/press-release rows; `scripts/match_wire_quotes.py` links their quotes
-   to Quotebank quotes (6-gram overlap, ≥8-word fragments, within a week). Fetch paused at
-   754/11,615 files for Jan–Apr 2020. `trace_quote.py --with-wire` merges them into timelines;
+   to Quotebank quotes (6-gram overlap, ≥8-word fragments, within a week). All 11,615 files
+   for Jan–Apr 2020 are loaded: 409k wire articles, 90k GDELT quotes, 57.8k matches to 19.6k
+   Quotebank quotes (for 6.1k of them the wire copy is >1h before Quotebank's first timed mention),
+   but only 16 of the 464 benchmark/watch items have a wire match. `trace_quote.py --with-wire` merges them into timelines;
    GDELT times are when GDELT saw the article (15-min resolution), an upper bound on publication.
-4. **Paraphrased facts beyond quotes.** Index the surrounding text as passages so the tracer can
+4. **Paraphrased facts beyond quotes.** (Events: see Event tracer.) Index the surrounding text as passages so the tracer can
    follow reported facts that never quote anyone; link facts to quotes (fact → quote → speaker).
 5. **More data.** Other Quotebank years (2008–2019, ~185 GB); Reuters TRC2 (2008–09, NIST
    agreement) for true wire timestamps alongside Quotebank 2008–09.

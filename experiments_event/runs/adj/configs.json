@@ -1,0 +1,308 @@
+{
+ "v0": {
+  "retrieval": {
+   "k": 30,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "v1": {
+  "retrieval": {
+   "k": 50,
+   "pool": 6,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r1_1": {
+  "retrieval": {
+   "k": 30,
+   "pool": 8,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r1_2": {
+  "retrieval": {
+   "k": 30,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision, arrival) involving the same people, places and figures, with no conflicting key details. Different wording is fine. A headline that gives less detail, attributes the news to a source (police, officials, a military), or covers the event from a different angle still matches if it clearly reports that event. A headline saying the same specific happening is confirmed and imminent or under way (e.g. 'will', 'to be', 'heading to', 'set to') also matches.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that is not yet the event (negotiations still under way, something being considered or possible, a decision not yet made, an earlier count or figure), a later development, or a similar event involving other people or places. If the claim's numbers differ from the headline's, it does not match unless the difference is only rounding.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r2_0": {
+  "retrieval": {
+   "k": 45,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 23,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r2_2": {
+  "retrieval": {
+   "k": 30,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision, agreement) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event. A headline that reports the same specific occurrence as already decided and imminent (for example that it will happen shortly or is under way) also matches.\n\nA candidate does NOT match if it is only on the same topic, reports a stage before the event was decided (talks, negotiations, deliberation, speculation, a proposal still under discussion), reports an earlier figure that the claim's figure updates, reports a later development, or describes a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r3_0": {
+  "retrieval": {
+   "k": 30,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision, arrival, arrest or charge) involving the same people, places and figures, with no conflicting key details. Different wording is fine. A headline that gives less detail still matches if it clearly reports that event, for example it names the incident but not yet the charge, or the decision but not its effects.\n\nThe first reports of an event often describe it as just announced, imminent or under way (\"will\", \"to\", \"set to\", \"heading to\", \"says it will\"). Such a headline MATCHES if it names the same concrete outcome the claim reports (the same action by the same actor in the same place), even if the claim describes it as completed.\n\nA candidate does NOT match if it:\n- is only on the same topic or gives general background;\n- reports deliberations before the outcome was settled (talks, negotiations, haggling, \"considering\", \"nears decision\", \"could\"), when the claim reports the agreement or decision itself;\n- reports a running count, toll or tally whose figures differ from the claim's (an earlier or later update of the same statistic);\n- reports a later development or reaction that follows the claim's event;\n- reports a similar event involving other people, places or figures.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "main_r3_1": {
+  "retrieval": {
+   "k": 40,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 20,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r2_1": {
+  "retrieval": {
+   "k": 60,
+   "pool": 8,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r2_2": {
+  "retrieval": {
+   "k": 60,
+   "pool": 6,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r3_1": {
+  "retrieval": {
+   "k": 60,
+   "pool": 6,
+   "query_template": "content"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r3_2": {
+  "retrieval": {
+   "k": 45,
+   "pool": 8,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r4_2": {
+  "retrieval": {
+   "k": 60,
+   "pool": 5,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r6_0": {
+  "retrieval": {
+   "k": 60,
+   "pool": 7,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r6_2": {
+  "retrieval": {
+   "k": 45,
+   "pool": 6,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r7_2": {
+  "retrieval": {
+   "k": 60,
+   "pool": 4,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r7_0": {
+  "retrieval": {
+   "k": 55,
+   "pool": 8,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ },
+ "retrieval_r9_2": {
+  "retrieval": {
+   "k": 45,
+   "pool": 7,
+   "query_template": "raw"
+  },
+  "verify": {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "batch": 15,
+   "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+   "show_date": true,
+   "show_source": false,
+   "show_copies": false,
+   "order": "score"
+  }
+ }
+}

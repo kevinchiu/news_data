@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firstline</title>
+<meta name="description" content="Precomputed traces of news statements back to the first outlet that carried them (offline copy).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Cpath d='M8 22h16M8 16h10M8 10h6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* Same look as the Firstline app (scripts/app_static/index.html), with no server: traces are baked in. */
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef; --surface: #fcfcfb; --surface-2: #efeee9; --border: #dedcd5;
+  --text: #0f0f0e; --text-2: #4a4946; --muted: #64635e; --link: #1d5fae;
+  --accent: #1f64b8; --accent-ink: #ffffff; --accent-soft: #e3edfa;
+  --series: #2a78d6; --series-fill: rgba(42, 120, 214, 0.10);
+  --first: #d4561f; --orig: #128a5f; --grid: #e7e5df;
+  --ok: #0f7a4a; --ok-soft: #e1f3ea; --warn: #8a5a00; --warn-soft: #fbf0d9; --err: #b42318; --err-soft: #fdecea;
+  --k-wire: #c27c00; --k-agg: #6250d6; --k-pr: #c4407a; --k-feed: #7a7973; --k-outlet: #2a78d6;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
+  --radius: 14px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --surface: #1a1a19; --surface-2: #242422; --border: #36352f;
+    --text: #f0efec; --text-2: #c9c8be; --muted: #a3a298; --link: #8bb8f2;
+    --accent: #2f6fc0; --accent-ink: #ffffff; --accent-soft: #1d2a3b;
+    --series: #3987e5; --series-fill: rgba(57, 135, 229, 0.16);
+    --first: #f07a45; --orig: #2fbf8a; --grid: #2c2c29;
+    --ok: #5fd39d; --ok-soft: #15291f; --warn: #f0c060; --warn-soft: #2d2412; --err: #ff8a80; --err-soft: #331715;
+    --k-wire: #e0a030; --k-agg: #9085e9; --k-pr: #e070a0; --k-feed: #9d9c93; --k-outlet: #3987e5;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --surface: #1a1a19; --surface-2: #242422; --border: #36352f;
+  --text: #f0efec; --text-2: #c9c8be; --muted: #a3a298; --link: #8bb8f2;
+  --accent: #2f6fc0; --accent-ink: #ffffff; --accent-soft: #1d2a3b;
+  --series: #3987e5; --series-fill: rgba(57, 135, 229, 0.16);
+  --first: #f07a45; --orig: #2fbf8a; --grid: #2c2c29;
+  --ok: #5fd39d; --ok-soft: #15291f; --warn: #f0c060; --warn-soft: #2d2412; --err: #ff8a80; --err-soft: #331715;
+  --k-wire: #e0a030; --k-agg: #9085e9; --k-pr: #e070a0; --k-feed: #9d9c93; --k-outlet: #3987e5;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); overflow-x: hidden;
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--series); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; min-width: 0; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* app bar */
+.appbar { position: sticky; top: 0; z-index: 20; height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.appbar-in { height: 100%; display: flex; align-items: stretch; gap: 18px; }
+.mini-brand { display: flex; align-items: center; gap: 8px; color: var(--text); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; flex: none; }
+.logo { width: 38px; height: 38px; border-radius: 10px; background: var(--series); display: grid; place-items: center; flex: none; }
+.logo svg { width: 22px; height: 22px; }
+.mini-brand .logo { width: 26px; height: 26px; border-radius: 7px; }
+.mini-brand .logo svg { width: 16px; height: 16px; }
+.offline { margin-left: auto; align-self: center; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+@media (max-width: 420px) { .offline { display: none !important; } }
+
+/* header */
+header.top { padding: 22px 0 8px; }
+.brand-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.brand h1 { margin: 0; font-size: 24px; letter-spacing: -0.02em; line-height: 1.1; }
+.brand p { margin: 2px 0 0; color: var(--text-2); font-size: 14.5px; }
+.badge { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 6px 12px 6px 10px; font-size: 13px; box-shadow: var(--shadow); max-width: 100%; }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--ok-soft); }
+.badge b { font-weight: 650; }
+.badge .sub { color: var(--muted); }
+
+/* cards and input */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); min-width: 0; }
+.input-card { padding: 18px; margin-top: 14px; }
+label.lbl { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
+textarea { width: 100%; min-height: 84px; resize: vertical; padding: 12px 14px; font: inherit; font-size: 16px;
+  color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+textarea:focus { outline: none; border-color: var(--series); box-shadow: 0 0 0 3px var(--accent-soft); }
+.controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+button.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; font: inherit;
+  font-weight: 650; padding: 0 22px; min-height: 42px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+button.primary:hover { filter: brightness(1.08); }
+.count { color: var(--muted); font-size: 12.5px; margin-left: auto; }
+.coverage { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.examples { margin-top: 14px; }
+.examples-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; margin: 0 0 8px; }
+.examples h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; font-weight: 650; }
+.examples .n { font-size: 12.5px; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; max-height: 196px; overflow-y: auto; padding: 2px; }
+.chip { font: inherit; font-size: 13.5px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 12px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; text-align: left; max-width: 100%; }
+.chip:hover { border-color: var(--series); background: var(--accent-soft); }
+.chip[aria-pressed="true"] { border-color: var(--series); background: var(--accent-soft); font-weight: 600; }
+.chip .t { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; flex: none; }
+.chip .t.ok { color: var(--ok); } .chip .t.miss { color: var(--warn); }
+.chip .k { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); flex: none; }
+.filters { display: inline-flex; gap: 4px; }
+.filters button { font: inherit; font-size: 12.5px; color: var(--text-2); background: none; border: 1px solid transparent; border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.filters button[aria-pressed="true"] { border-color: var(--border); background: var(--surface-2); color: var(--text); font-weight: 600; }
+.badges { display: grid; gap: 6px; justify-items: start; }
+.chip .l { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 38ch; }
+
+/* results */
+#result { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.section-title { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 650; }
+.stmt-card { padding: 16px 20px; }
+.stmt { margin: 0; font-size: 18px; line-height: 1.5; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+.stmt-meta { margin-top: 8px; color: var(--text-2); font-size: 13.5px; overflow-wrap: anywhere; }
+.match-card { padding: 14px 20px; }
+.match-card + .match-card { margin-top: 10px; }
+.quote-text { font-size: 17px; line-height: 1.5; margin: 0; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; overflow-wrap: anywhere; }
+.quote-text.q::before { content: "\201C"; color: var(--series); font-size: 1.3em; line-height: 0; margin-right: 2px; }
+.quote-text.q::after { content: "\201D"; color: var(--series); font-size: 1.3em; line-height: 0; margin-left: 2px; }
+.quote-meta { margin-top: 8px; color: var(--text-2); font-size: 13.5px; display: flex; gap: 6px 14px; flex-wrap: wrap; }
+.quote-meta b { color: var(--text); }
+.more { font: inherit; font-size: 13.5px; background: none; border: 0; color: var(--link); cursor: pointer; padding: 6px 0 0; text-decoration: underline; }
+.gtmark { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--orig); }
+
+.headline-cards { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .headline-cards { grid-template-columns: minmax(0, 1fr); } }
+.hl { padding: 18px 20px; position: relative; overflow: hidden; }
+.hl::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--first); }
+.hl.orig::before { background: var(--orig); }
+.hl .kicker { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2); font-weight: 700; }
+.hl .outlet { font-size: 22px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.hl .when { color: var(--text-2); font-size: 14px; }
+.hl .title { margin: 10px 0 0; font-size: 14.5px; overflow-wrap: anywhere; }
+.hl .explain { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+.bench { margin-top: 12px; font-size: 13px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); color: var(--text-2); overflow-wrap: anywhere; }
+.bench.ok { background: var(--ok-soft); color: var(--text); } .bench.ok b { color: var(--ok); }
+.bench.miss { background: var(--warn-soft); color: var(--text); } .bench.miss b { color: var(--warn); }
+
+.kind { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; background: var(--surface-2); white-space: nowrap; }
+.kind::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--k-outlet); }
+.kind.k-wire::before { background: var(--k-wire); }
+.kind.k-aggregator::before { background: var(--k-agg); }
+.kind.k-press_release::before { background: var(--k-pr); }
+.kind.k-feed::before { background: var(--k-feed); }
+
+.spread-card { padding: 18px 20px; }
+.spread-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.spread-head .big { font-size: 15px; color: var(--text-2); }
+.spread-head .big b { color: var(--text); font-size: 20px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-2); margin-top: 6px; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chart-box { margin-top: 10px; overflow-x: auto; }
+.chart-box svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.chart-box text { font: 11px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; fill: var(--muted); }
+.c-grid { stroke: var(--grid); stroke-width: 1; }
+.c-area { fill: var(--series-fill); }
+.c-line { fill: none; stroke: var(--series); stroke-width: 2; }
+.c-dot { fill: var(--series); }
+.c-first { fill: var(--first); stroke: var(--surface); stroke-width: 2; }
+.c-gt { fill: none; stroke: var(--orig); stroke-width: 2.5; }
+.table-wrap { overflow-x: auto; margin-top: 16px; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+td.time { white-space: nowrap; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); }
+td.outlet { font-weight: 600; overflow-wrap: anywhere; min-width: 140px; }
+tr.is-first td { background: color-mix(in srgb, var(--first) 9%, transparent); }
+tr.is-orig td { background: color-mix(in srgb, var(--orig) 9%, transparent); }
+.tag { display: inline-block; white-space: nowrap; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-left: 6px; }
+.tag.first { color: var(--first); } .tag.orig { color: var(--orig); }
+.dateonly { color: var(--muted); font-size: 11.5px; font-family: inherit; }
+.note-more { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+
+.how { padding: 14px 20px; font-size: 13px; color: var(--text-2); }
+.how ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 2px; }
+.how .cfg { margin-top: 8px; color: var(--muted); }
+.message { padding: 22px; }
+.message h2 { margin: 0 0 6px; font-size: 18px; }
+.message p { margin: 6px 0; color: var(--text-2); }
+footer.foot { margin: 32px 0 28px; color: var(--muted); font-size: 12.5px; display: flex; gap: 6px 16px; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 14px; }
+</style>
+</head>
+<body>
+<nav class="appbar" aria-label="Firstline">
+  <div class="wrap appbar-in">
+    <span class="mini-brand">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M5 17h14M5 12h9M5 7h5"/></svg></span>
+      Firstline
+    </span>
+    <span class="offline">Offline copy · precomputed traces</span>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M5 17h14M5 12h9M5 7h5"/></svg></div>
+        <div>
+          <h1>Firstline</h1>
+          <p id="tagline"></p>
+        </div>
+      </div>
+      <div class="badges" id="badges"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card input-card" aria-label="Find a traced statement">
+      <form id="form" novalidate>
+        <label class="lbl" for="statement">Statement from a news story: a quote or an event</label>
+        <textarea id="statement" maxlength="500"></textarea>
+        <div class="controls">
+          <button class="primary" type="submit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+            Trace
+          </button>
+          <span class="count" id="count" aria-live="polite"></span>
+        </div>
+        <p class="coverage" id="coverage"></p>
+      </form>
+      <div class="examples">
+        <div class="examples-head"><h2 id="ex-h">Held-out benchmark examples</h2>
+          <span class="filters" role="group" aria-label="Show">
+            <button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="quotes" aria-pressed="false">Quotes</button><button type="button" data-f="events" aria-pressed="false">Events</button>
+          </span><span class="n" id="ex-n"></span></div>
+        <div class="chips" id="chips" role="group" aria-labelledby="ex-h"></div>
+      </div>
+    </section>
+    <div id="result" aria-live="polite"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-data"></span>
+    <span>Built __BUILT__ from precomputed traces; no model calls happen on this page.</span>
+  </footer>
+</div>
+
+<script>
+var DATA = __DATA__;
+</script>
+<script>
+"use strict";
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const KIND_LABEL = { outlet: "outlet", wire: "wire", aggregator: "aggregator", press_release: "press release", feed: "feed" };
+  const TEXT = {
+    quotes: {
+      kind: "Quote", archive: "Quotebank",
+      noun: "quotation", nouns: "quotations"
+    },
+    events: {
+      kind: "Event", archive: "GDELT headlines",
+      noun: "headline", nouns: "headlines"
+    }
+  };
+  // one list: quotes and events interleaved; each example remembers its archive
+  const ALL = [];
+  for (let i = 0; i < Math.max(DATA.quotes.examples.length, DATA.events.examples.length); i++)
+    for (const t of ["quotes", "events"]) if (DATA[t].examples[i]) ALL.push(Object.assign({ _task: t }, DATA[t].examples[i]));
+  let task = "quotes", current = null, filter = "all";
+
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const kid of kids.flat(Infinity)) {
+      if (kid == null || kid === false) continue;
+      el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  }
+  function svg(tag, attrs) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, String(v));
+    return el;
+  }
+  function safeUrl(u) {
+    try { const p = new URL(u); return (p.protocol === "http:" || p.protocol === "https:") ? p.href : null; } catch (e) { return null; }
+  }
+  function link(url, text) {
+    const u = safeUrl(url);
+    return u ? h("a", { href: u, target: "_blank", rel: "noopener", title: "Original article (2020; may have moved)" }, text) : h("span", null, text);
+  }
+  function pct(x) { return x == null ? "–" : (100 * x).toFixed(1).replace(/\.0$/, "") + "%"; }
+  function ts(iso) { return Date.parse(String(iso).slice(0, 16) + ":00Z"); }
+  function fmtDate(iso, withTime = true) {
+    const t = ts(iso); if (isNaN(t)) return String(iso || "");
+    const d = new Date(t);
+    let s = d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear();
+    if (withTime) s += ", " + String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0");
+    return s;
+  }
+  function gap(a, b) {
+    let m = Math.round((ts(b) - ts(a)) / 60000); m = Math.abs(m);
+    if (m < 60) return m + " min";
+    if (m < 2880) return (m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, "") + " h";
+    return Math.round(m / 1440) + " days";
+  }
+  function kindBadge(kind) { const k = KIND_LABEL[kind] ? kind : "outlet"; return h("span", { class: "kind k-" + k }, KIND_LABEL[k]); }
+  function label(D) { return D.best_label === "final" ? "final config" : D.best_label === "with fixes" ? "+ fixes" : D.best_label; }
+  function effTs(r) { const t = ts(r.t); return r.timed === false ? t + 864e5 - 6e4 : t; }
+
+  // ---- header ----
+  function init() {
+    $("#tagline").textContent = "Trace a quote or an event from the news back to the outlet that reported it first, and watch how it spread.";
+    $("#statement").placeholder = "e.g. Jose Mourinho said Eric Dier did something professionals cannot do";
+    $("#coverage").textContent = "Quotes: Quotebank, English-language news quotations, 1 Jan to 17 Apr 2020. Events: headlines GDELT collected, 1 Jan to 30 Apr 2020; " +
+      "their times are when GDELT’s crawler first saw each article (UTC, 15-minute steps). This offline copy holds the tracer’s answers for the held-out examples below: type to find one, or pick it.";
+    $("#badges").replaceChildren(...["quotes", "events"].map((t) => {
+      const D = DATA[t], r = D.results.test;
+      return h("span", { class: "badge" }, h("span", { class: "dot", "aria-hidden": "true" }),
+        h("span", null, h("b", null, TEXT[t].kind + "s · tracer " + label(D)), " · ", h("b", null, pct(r.best.score)), " on held-out test ",
+          h("span", { class: "sub" }, "(baseline " + pct(r.base.score) + ")")));
+    }));
+    $("#foot-data").textContent = "Data: Quotebank (Vaucher et al., WSDM 2021), CC BY 4.0; event headlines from the GDELT Project. Event answers are checked against model-made labels (Claude Sonnet), audited by Claude Fable. Both tracers were tuned by a self-improving loop.";
+    document.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
+      filter = b.dataset.f;
+      document.querySelectorAll(".filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      renderChips();
+    }));
+    updateCount(); renderChips();
+    const first = ALL.find((e) => e.best.correct && !e.base.correct) || ALL[0];
+    if (first) { show(first); renderChips(); }
+  }
+
+  // ---- finding an example ----
+  const words = (s) => (String(s).toLowerCase().match(/[a-z0-9']+/g) || []).filter((w) => w.length > 2);
+  function score(ex, q) {
+    const qs = new Set(words(q)); if (!qs.size) return 0;
+    const hay = new Set(words([ex.statement, ex.speaker, ex.source_title, ex.gt.title, ex.gt.outlet].join(" ")));
+    let n = 0; qs.forEach((w) => { if (hay.has(w)) n++; });
+    return n / qs.size;
+  }
+  function ranked() {
+    const q = $("#statement").value.trim(), pool = ALL.filter((e) => filter === "all" || e._task === filter);
+    if (!q) return pool;
+    return pool.map((e) => [score(e, q), e]).filter((x) => x[0] > 0).sort((a, b) => b[0] - a[0]).map((x) => x[1]);
+  }
+  function renderChips() {
+    const list = ranked(), n = ALL.filter((e) => filter === "all" || e._task === filter).length;
+    $("#ex-n").textContent = $("#statement").value.trim() ? list.length + " of " + n + " match" : n + " traced";
+    $("#chips").replaceChildren(...list.map((ex) => h("button", {
+      type: "button", class: "chip", title: ex.statement, "aria-pressed": String(current === ex),
+      onclick: () => { $("#statement").value = ex.statement; updateCount(); show(ex); renderChips(); }
+    }, h("span", { class: "k" }, TEXT[ex._task].kind), h("span", { class: "t " + (ex.best.correct ? "ok" : "miss") }, ex.best.correct ? "right" : "missed"), h("span", { class: "l" }, ex.statement))));
+  }
+  function updateCount() { $("#count").textContent = $("#statement").value.length + " / 500"; }
+  $("#statement").addEventListener("input", () => { updateCount(); renderChips(); });
+  $("#statement").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); trace(); } });
+  $("#form").addEventListener("submit", (e) => { e.preventDefault(); trace(); });
+  function trace() {
+    const q = $("#statement").value.trim();
+    const best = q ? ranked()[0] : null;
+    if (best && score(best, q) >= 0.3) { show(best); renderChips(); return; }
+    current = null; renderChips();
+    $("#result").replaceChildren(h("section", { class: "card message" },
+      h("h2", null, q ? "No traced example matches" : "Enter a statement first"),
+      h("p", null, "This offline copy can only show statements that were traced in advance: the held-out benchmark examples listed above. Pick one, or type a few of its words to find it."),
+      h("p", null, "Live tracing of new statements needs the Firstline app (scripts/app.py) and the local database.")));
+  }
+
+  // ---- results ----
+  function show(ex) {
+    current = ex; task = ex._task;
+    const out = [statementCard(ex), matchesSection(ex), headlineCards(ex), spreadCard(ex), howCard(ex)];
+    $("#result").replaceChildren(...out.filter(Boolean));
+  }
+  function statementCard(ex) {
+    return h("section", { class: "card stmt-card", "aria-label": "Statement traced" },
+      h("h2", { class: "section-title" }, TEXT[ex._task].kind + " traced · " + TEXT[ex._task].archive),
+      h("p", { class: "stmt" }, ex.statement),
+      h("div", { class: "stmt-meta" }, "As of " + fmtDate(ex.as_of) + " · reworded from a later report by ",
+        link(ex.source_url, ex.source_outlet || "the source"), ex.source_title ? ": “" + ex.source_title + "”" : ""));
+  }
+  function matchCard(m, isQ) {
+    return h("article", { class: "card match-card" },
+      h("p", { class: "quote-text" + (isQ ? " q" : "") }, isQ ? m.text : m.title),
+      h("div", { class: "quote-meta" },
+        isQ ? h("span", null, "Speaker: ", h("b", null, m.speaker && m.speaker !== "None" ? m.speaker : "unattributed")) : h("span", null, "Outlet: ", h("b", null, m.outlet)),
+        h("span", null, "First seen: ", h("b", null, isQ && /T00:00/.test(m.date) ? fmtDate(m.date, false) : fmtDate(m.date))),
+        isQ ? h("span", null, "Carried by " + m.articles + " article" + (m.articles === 1 ? "" : "s")) : (m.copies ? h("span", null, "+" + m.copies + " syndicated copies") : null),
+        m.gt ? h("span", { class: "gtmark" }, isQ ? "benchmark quote" : "first-wave headline") : null));
+  }
+  function matchesSection(ex) {
+    const isQ = task === "quotes", T = TEXT[task], ms = ex.best.matched.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+    if (!ms.length) return h("section", { class: "card message" }, h("h2", null, "No " + T.noun + " in the archive says this"),
+      h("p", null, "Claude checked " + ex.best.n_candidates + " similar " + T.nouns + " published before then and kept none."));
+    const total = ex.best.n_matched;
+    const sec = h("section", { "aria-labelledby": "mq-h" },
+      h("h2", { class: "section-title", id: "mq-h" }, total === 1 ? "Matched " + T.noun : "Matched " + T.nouns + " (" + total + ")"));
+    sec.append(matchCard(ms[0], isQ));
+    if (ms.length > 1) {
+      const rest = h("div", { hidden: true }, ms.slice(1).map((m) => matchCard(m, isQ)));
+      const label = () => rest.hidden ? "Show " + (ms.length - 1) + " more" + (total > ms.length ? " (of " + (total - 1) + ")" : "") : "Hide the others";
+      const btn = h("button", { type: "button", class: "more", "aria-expanded": "false",
+        onclick: () => { rest.hidden = !rest.hidden; btn.setAttribute("aria-expanded", String(!rest.hidden)); btn.textContent = label(); } }, label());
+      sec.append(btn, rest);
+    }
+    return sec;
+  }
+  function headlineCards(ex) {
+    const isQ = task === "quotes", f = ex.best.first, g = ex.gt;
+    let verdict = null;
+    if (f) {
+      if (ex.best.correct) verdict = h("div", { class: "bench ok" }, h("b", null, "✓ Matches the benchmark answer. "),
+        ex.best.tie ? "A different article at the same time as the benchmark’s (a syndicated copy), so it counts." : (!isQ && f.url !== g.url ? "Within the first wave (reports in the first 30 minutes count)." : ""));
+      else verdict = h("div", { class: "bench miss" }, h("b", null, f.date < g.date ? "Too early: " : "Too late: "),
+        gap(f.date, g.date) + (f.date < g.date ? " before" : " after") + " the benchmark’s first report." +
+        (ex.best.adjudicated === false ? " The labeller reviewed this earlier report and judged it a different event." : ""));
+    }
+    const first = f ? h("article", { class: "card hl" },
+      h("div", { class: "kicker" }, "First appeared · tracer"),
+      h("div", { class: "outlet" }, f.outlet),
+      h("div", { class: "when" }, f.timed === false ? fmtDate(f.date, false) + " (date only)" : fmtDate(f.date), isQ && f.kind ? [" · ", kindBadge(f.kind)] : null),
+      f.title ? h("p", { class: "title" }, link(f.url, f.title)) : h("p", { class: "title" }, link(f.url, f.url)),
+      isQ && f.quote ? h("p", { class: "explain" }, "“" + f.quote + "”") : null,
+      verdict)
+      : h("article", { class: "card hl" }, h("div", { class: "kicker" }, "First appeared · tracer"), h("div", { class: "outlet" }, "Nothing found"),
+        h("p", { class: "explain" }, "No " + TEXT[task].noun + " published before then was judged to say the same thing."));
+    const truth = h("article", { class: "card hl orig" },
+      h("div", { class: "kicker" }, "Benchmark answer"),
+      h("div", { class: "outlet" }, g.outlet),
+      h("div", { class: "when" }, fmtDate(g.date)),
+      g.title ? h("p", { class: "title" }, link(g.url, g.title)) : h("p", { class: "title" }, link(g.url, g.url)),
+      isQ && g.quote ? h("p", { class: "explain" }, "“" + g.quote + "”") : null,
+      h("p", { class: "explain" }, (isQ ? "The earliest timed mention of the quote in Quotebank" : "The labelled first report" + (g.wave > 1 ? "; " + (g.wave - 1) + " more report" + (g.wave > 2 ? "s" : "") + " within 30 minutes also count" : "")) +
+        ". " + gap(g.date, ex.as_of) + " before the story the statement came from."));
+    return h("section", { class: "headline-cards", "aria-label": "Where it started" }, first, truth);
+  }
+
+  function spreadCard(ex) {
+    const isQ = task === "quotes", sp = ex.spread.map((r, i) => [effTs(r), i, r]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]);
+    const card = h("section", { class: "card spread-card", "aria-labelledby": "sp-h" },
+      h("div", { class: "spread-head" },
+        h("h2", { class: "section-title", id: "sp-h", style: "margin:0" }, "How it spread"),
+        h("div", { class: "big" }, h("b", null, String(ex.best.n_outlets)), " outlet" + (ex.best.n_outlets === 1 ? "" : "s") + " · " + ex.best.n_mentions + (isQ ? " mentions" : " articles"))),
+      h("div", { class: "legend", "aria-hidden": "true" },
+        h("span", null, h("i", { style: "background:var(--series)" }), "Outlets carrying it (cumulative)"),
+        h("span", null, h("i", { style: "background:var(--first)" }), "Tracer’s first appearance"),
+        h("span", null, h("i", { style: "border:2.5px solid var(--orig);width:12px;height:12px" }), "Benchmark answer"),
+        sp.some((r) => r.timed === false) ? h("span", null, "Date-only stamps sit at the end of their day") : null));
+    if (sp.length) card.append(h("div", { class: "chart-box" }, chart(sp)));
+    const tbody = h("tbody", null, sp.map((r) => h("tr", { class: r.first ? "is-first" : r.gt ? "is-orig" : null },
+      h("td", { class: "time" }, r.timed === false ? [fmtDate(r.t, false), h("br"), h("span", { class: "dateonly" }, "date only")] : fmtDate(r.t)),
+      h("td", { class: "outlet" }, link(r.u, r.o), r.first ? h("span", { class: "tag first" }, "first") : null, r.gt ? h("span", { class: "tag orig" }, "benchmark") : null,
+        !r.first && !r.gt && r.wave ? h("span", { class: "tag orig" }, "first wave") : null),
+      isQ ? h("td", null, kindBadge(r.k)) : null)));
+    card.append(h("div", { class: "table-wrap" }, h("table", null,
+      h("caption", { class: "sr-only" }, "First appearance per outlet, in time order"),
+      h("thead", null, h("tr", null, h("th", { scope: "col" }, "Time (UTC)"), h("th", { scope: "col" }, "Outlet"), isQ ? h("th", { scope: "col" }, "Kind") : null)), tbody)));
+    if (ex.spread_more) card.append(h("p", { class: "note-more" }, "The earliest " + sp.length + " outlets are shown; " + ex.spread_more + " more carried it later."));
+    return card;
+  }
+  function pickStep(span) {
+    const H = 36e5, D = 864e5, steps = [H / 4, H / 2, H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D, 14 * D, 28 * D];
+    return steps.find((s) => span / s <= 7) || 28 * D;
+  }
+  function chart(sp) {
+    const W = 900, H = 240, X0 = 40, X1 = W - 14, Y0 = H - 28, Y1 = 12;
+    const t0 = effTs(sp[0]), t1 = effTs(sp[sp.length - 1]);
+    const step = pickStep(Math.max(t1 - t0, 36e5)), min = Math.floor(t0 / step) * step, max = Math.max(Math.ceil(t1 / step) * step, min + step);
+    const n = sp.length, yStep = n <= 10 ? 2 : n <= 25 ? 5 : 10, yMax = Math.ceil(n / yStep) * yStep;
+    const X = (t) => X0 + (X1 - X0) * (t - min) / (max - min), Y = (v) => Y0 - (Y0 - Y1) * v / yMax;
+    const s = svg("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Cumulative number of outlets over time; the table below lists them." });
+    for (let v = 0; v <= yMax; v += yStep) {
+      s.append(svg("line", { class: "c-grid", x1: X0, x2: X1, y1: Y(v), y2: Y(v) }));
+      const t = svg("text", { x: X0 - 6, y: Y(v) + 4, "text-anchor": "end" }); t.textContent = v; s.append(t);
+    }
+    const hours = step < 864e5;
+    for (let t = min; t <= max + 1; t += step) {
+      const d = new Date(t), x = X(t);
+      s.append(svg("line", { class: "c-grid", x1: x, x2: x, y1: Y1, y2: Y0 }));
+      const lab = svg("text", { x, y: Y0 + 16, "text-anchor": t === min ? "start" : t + step > max + 1 ? "end" : "middle" });
+      lab.textContent = hours && !(d.getUTCHours() === 0 && d.getUTCMinutes() === 0)
+        ? String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0")
+        : d.getUTCDate() + " " + MONTHS[d.getUTCMonth()];
+      s.append(lab);
+    }
+    let d = "M" + X(effTs(sp[0])) + " " + Y0;
+    sp.forEach((r, i) => { d += " H" + X(effTs(r)) + " V" + Y(i + 1); });
+    s.append(svg("path", { class: "c-area", d: d + " H" + X1 + " V" + Y0 + " Z" }), svg("path", { class: "c-line", d: d + " H" + X1 }));
+    sp.forEach((r, i) => {
+      const cx = X(effTs(r)), cy = Y(i + 1);
+      if (r.gt) s.append(svg("circle", { class: "c-gt", cx, cy, r: 9 }));
+      s.append(svg("circle", { class: r.first ? "c-first" : "c-dot", cx, cy, r: r.first ? 6 : n <= 40 ? 2.5 : 0 }));
+      const tip = svg("title"); tip.textContent = r.o + " · " + fmtDate(r.t); s.lastChild.append(tip);
+    });
+    return s;
+  }
+  function howCard(ex) {
+    const isQ = task === "quotes", D = DATA[task], b = ex.best, T = TEXT[task];
+    return h("section", { class: "card how", "aria-label": "How it was traced" },
+      h("strong", null, "How it was traced"),
+      h("ol", null,
+        h("li", null, "Full-text search (BM25) over " + (isQ ? "5.2M unique quotations" : "GDELT headlines from the 7 days before") + " found " + b.n_candidates + " candidate " + (isQ ? T.nouns : "headline groups") + " published before " + fmtDate(ex.as_of) + "."),
+        h("li", null, "Claude Haiku judged which candidates say the same thing: " + b.n_matched + " kept, in " + b.calls + " call" + (b.calls === 1 ? "" : "s") + " (the baseline kept " + ex.base.n_matched + ")."),
+        h("li", null, "Every article carrying a kept " + T.noun + " gave the timeline: " + b.n_mentions + (isQ ? " mentions" : " articles") + " across " + b.n_outlets + " outlets; the earliest is the answer.")),
+      h("div", { class: "cfg" }, "Tracer " + label(D) + " (tuned by the self-improvement loop) · baseline answer: ",
+        ex.base.first ? ex.base.first.outlet + ", " + fmtDate(ex.base.first.date) + (ex.base.correct ? " (right)" : " (wrong)") : "nothing found"));
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

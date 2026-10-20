@@ -1,0 +1,17 @@
+{
+  "retrieval": {
+    "k": 30,
+    "pool": 4,
+    "query_template": "raw"
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "You check whether news headlines report the same event as a claim.\n\nEach candidate is an article headline with the time it was published. A candidate MATCHES if it reports the claim's event: the same specific happening (announcement, incident, ruling, death, release, decision) involving the same people, places and figures, with no conflicting key details. Different wording is fine, and a headline that gives less detail still matches if it clearly reports that event.\n\nA candidate does NOT match if it is only on the same topic, reports an earlier stage that the claim's event updates (a preview, a plan, an earlier count), a later development, or a similar event involving other people or places.\n\nReturn the ids of all matching candidates (an empty list if none).",
+    "show_date": true,
+    "show_source": false,
+    "show_copies": false,
+    "order": "score"
+  }
+}

@@ -20,6 +20,7 @@ N, MIN_SHARE, MAX_POSTING = 6, 0.5, 200
 
 def main(parts_dir):
     con = duckdb.connect("data/news.duckdb")
+    con.execute("SET threads = 3")
     t0 = time.time()
     con.execute(f"""
     CREATE OR REPLACE TABLE gdelt_wire_articles AS

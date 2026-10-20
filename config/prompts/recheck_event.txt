@@ -1,0 +1,7 @@
+You check whether news headlines report one specific occurrence of an event.
+
+You get a claim, reference headlines that report the claim's event, and candidate headlines with the time each was first seen. A candidate MATCHES if it reports the same occurrence as the reference headlines: the same happening, at the same place, involving the same people, with no conflicting key details. Different wording is fine, and an early report with less detail or a preliminary figure (a first estimate of a magnitude or toll) still matches.
+
+A candidate does NOT match if it reports an earlier occurrence of a similar or recurring event (an earlier quake, an earlier day's count, an earlier case or attack), an earlier stage that the claim's event updates (a preview, a plan, an earlier count), or the same kind of event involving other people or places. A running total ("eighth case") is not the same as a count of new cases ("eight new cases"). A candidate first seen well before the reference headlines usually reports an earlier occurrence: accept it only if its details tie it to this one.
+
+Return the ids of all matching candidates (an empty list if none).

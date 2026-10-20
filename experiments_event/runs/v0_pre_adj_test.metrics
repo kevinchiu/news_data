@@ -1,0 +1,1 @@
+{"n": 130, "recall_at_k": 0.646, "verifier_recall": 0.81, "first_report": 0.408, "early": 0.192, "late": 0.323, "none": 0.077, "calls_per_claim": 1.9, "new_calls": 0}

@@ -1,0 +1,776 @@
+<title>Who Reported It First</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+/* Layout: one reading column for the story, widening to a two-pane desk (story list + trace) for the browser. */
+:root {
+  --bg: #f2f4f3; --surface: #ffffff; --surface-2: #e8ecea; --line: #d3d9d6; --grid: #e0e5e2;
+  --ink: #121a1f; --ink-2: #39444b; --muted: #5d6970;
+  --accent: #1f4fd1; --accent-soft: #e1e8fb; --accent-ink: #ffffff;
+  --gt: #9a5a00; --gt-soft: #f7ead4;
+  --ok: #16704a; --ok-soft: #daefe3; --bad: #b0281f; --bad-soft: #f8e0dd; --warn: #85570a; --warn-soft: #f6ecd6;
+  --dot: #8a969c; --val: #6f8590;
+  --f-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-body: "Public Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1315; --surface: #151c1f; --surface-2: #1d262a; --line: #2b373c; --grid: #223034;
+    --ink: #e5ebed; --ink-2: #bfcace; --muted: #8b999f;
+    --accent: #87a6ff; --accent-soft: #1b2950; --accent-ink: #0e1315;
+    --gt: #e9ab4d; --gt-soft: #3a2a10;
+    --ok: #5fcf95; --ok-soft: #12331f; --bad: #ff8b80; --bad-soft: #3e1814; --warn: #e2b55e; --warn-soft: #362a12;
+    --dot: #6d7b81; --val: #9db0b9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1315; --surface: #151c1f; --surface-2: #1d262a; --line: #2b373c; --grid: #223034;
+  --ink: #e5ebed; --ink-2: #bfcace; --muted: #8b999f;
+  --accent: #87a6ff; --accent-soft: #1b2950; --accent-ink: #0e1315;
+  --gt: #e9ab4d; --gt-soft: #3a2a10;
+  --ok: #5fcf95; --ok-soft: #12331f; --bad: #ff8b80; --bad-soft: #3e1814; --warn: #e2b55e; --warn-soft: #362a12;
+  --dot: #6d7b81; --val: #9db0b9;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55;
+  margin: 0; -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px; display: grid; gap: 64px;
+}
+section { display: grid; gap: 20px; min-width: 0; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; color: var(--ink); }
+h1 { font-size: clamp(2.3rem, 6vw, 3.6rem); line-height: 1.04; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.15; }
+h3 { font-size: 1.25rem; line-height: 1.25; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+}
+.eyebrow { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--ink-2); }
+.muted { color: var(--muted); }
+.mono, time, .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.small { font-size: 0.875rem; }
+.stack { display: grid; gap: 12px; min-width: 0; }
+
+/* opening */
+.intro { display: grid; gap: 18px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin: 8px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; border-top: 2px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; min-width: 0; }
+.steps li::before { content: "Step " counter(s); font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.steps b { font-weight: 600; }
+.steps span { color: var(--ink-2); font-size: 0.95rem; }
+
+/* tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab {
+  font: 600 0.95rem var(--f-body); color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent;
+  padding: 10px 14px 9px; cursor: pointer; margin-bottom: -1px;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--ink); }
+.tab .tab-sub { font-weight: 400; color: var(--muted); font-size: 0.82rem; margin-left: 6px; }
+
+.taskline { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: baseline; justify-content: space-between; }
+.score { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.9rem; color: var(--ink-2); }
+.score b { font-family: var(--f-mono); font-weight: 500; color: var(--ink); }
+
+/* browser */
+.desk { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.listpane { display: grid; gap: 10px; min-width: 0; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.controls { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+input[type="search"], select {
+  font: 400 0.95rem var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; min-width: 0; width: 100%;
+}
+select { width: auto; }
+.list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: 640px; overflow-y: auto; }
+.list li + li { border-top: 1px solid var(--grid); }
+.item {
+  display: grid; gap: 4px; width: 100%; text-align: left; background: none; border: 0; cursor: pointer;
+  padding: 10px 12px; font: inherit; color: var(--ink);
+}
+.item:hover { background: var(--surface-2); }
+.item[aria-current="true"] { background: var(--accent-soft); }
+.item-text { font-size: 0.9rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 0.75rem; color: var(--muted); }
+.count { font-size: 0.8rem; color: var(--muted); }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; font: 600 0.72rem var(--f-body); letter-spacing: 0.02em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.neutral { background: var(--surface-2); color: var(--ink-2); }
+.pill.accent { background: var(--accent-soft); color: var(--accent); }
+
+.detail { display: grid; gap: 18px; min-width: 0; }
+.statement { border-left: 3px solid var(--ink); padding: 2px 0 2px 16px; display: grid; gap: 8px; }
+.statement q { font-family: var(--f-display); font-size: 1.35rem; line-height: 1.35; quotes: none; }
+.statement .meta { font-size: 0.85rem; color: var(--muted); }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.card.tracer { border-top: 3px solid var(--accent); }
+.card.truth { border-top: 3px solid var(--gt); }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card-label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.when { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 1.05rem; font-weight: 500; }
+.outlet { font-weight: 600; overflow-wrap: anywhere; }
+.headline { font-family: var(--f-display); font-size: 1.05rem; line-height: 1.35; overflow-wrap: anywhere; }
+.quote { font-size: 0.9rem; color: var(--ink-2); border-left: 2px solid var(--line); padding-left: 10px; overflow-wrap: anywhere; }
+.baseline { font-size: 0.85rem; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 8px; display: grid; gap: 4px; }
+.note { font-size: 0.85rem; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 8px 12px; }
+
+.block-title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; color: var(--ink-2); align-items: center; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.lg-first { background: var(--accent); }
+.lg-gt { border: 2px solid var(--gt); background: transparent; }
+.lg-other { background: var(--dot); }
+.lg-wave { background: var(--gt); opacity: 0.55; }
+.lg-hollow { border: 1.5px solid var(--dot); background: transparent; }
+.scroller { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.scroller svg { display: block; min-width: 620px; width: 100%; height: auto; }
+
+svg text { font-family: var(--f-body); }
+.sv-axis { fill: var(--muted); font-size: 11px; font-family: var(--f-mono); }
+.sv-time { fill: var(--muted); font-size: 11.5px; font-family: var(--f-mono); }
+.sv-outlet { fill: var(--ink-2); font-size: 12.5px; }
+.sv-outlet.is-first { fill: var(--accent); font-weight: 600; }
+.sv-outlet.is-gt { fill: var(--gt); font-weight: 600; }
+.sv-grid { stroke: var(--grid); stroke-width: 1; fill: none; }
+.sv-stem { stroke: var(--grid); stroke-width: 1; fill: none; }
+.sv-dot { fill: var(--dot); }
+.sv-dot.hollow { fill: var(--surface); stroke: var(--dot); stroke-width: 1.5; }
+.sv-dot.wave { fill: var(--gt); fill-opacity: 0.55; }
+.sv-first { fill: var(--accent); }
+.sv-gt { fill: none; stroke: var(--gt); stroke-width: 2.2; }
+.sv-band { fill: var(--accent-soft); }
+.sv-band-gt { fill: var(--gt-soft); }
+
+.matches { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.matches li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; min-width: 0; }
+.matches .m-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.matches .m-text { font-size: 0.92rem; overflow-wrap: anywhere; }
+.facts { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
+
+/* loop */
+.loop-task { display: grid; gap: 20px; border-top: 2px solid var(--ink); padding-top: 18px; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-weight: 600; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.02em; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+td.notes { min-width: 260px; }
+td.settings { min-width: 240px; }
+td.split { min-width: 130px; }
+tr.key td { font-weight: 600; }
+.delta-up { color: var(--ok); }
+.delta-down { color: var(--bad); }
+.chart-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.8rem; color: var(--ink-2); align-items: center; }
+.sw { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--accent); margin-right: 6px; vertical-align: 3px; }
+.sw.val { border-top: 2px dashed var(--val); }
+.sw-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+.sw-dot.acc { background: var(--accent); }
+.sw-dot.rej { border: 1.5px solid var(--dot); }
+.sv-inc { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+.sv-val { stroke: var(--val); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+.sv-acc { fill: var(--accent); }
+.sv-rej { fill: var(--surface); stroke: var(--dot); stroke-width: 1.5; }
+.sv-mark { stroke: var(--gt); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.sv-mark-label { fill: var(--gt); font-size: 11px; }
+.sv-label { fill: var(--ink-2); font-size: 11.5px; font-family: var(--f-mono); }
+.sv-label-acc { fill: var(--accent); font-size: 11.5px; font-family: var(--f-mono); font-weight: 500; }
+.linesel { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: 500 0.85rem var(--f-body); background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.rounds { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.round { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--grid); }
+.round-n { font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); display: grid; gap: 6px; align-content: start; justify-items: start; }
+.props { display: grid; gap: 10px; min-width: 0; }
+.prop { display: grid; gap: 3px; min-width: 0; }
+.prop-change { font-weight: 500; overflow-wrap: anywhere; }
+.prop-why { font-size: 0.85rem; color: var(--ink-2); }
+.prop-stats { font-size: 0.8rem; color: var(--muted); font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+details { font-size: 0.85rem; }
+summary { cursor: pointer; color: var(--accent); }
+details pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 0.8rem/1.5 var(--f-mono); background: var(--surface-2); border-radius: 8px; padding: 10px 12px; margin: 8px 0 0; color: var(--ink-2); }
+.prompt-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.screened { font-size: 0.82rem; color: var(--muted); }
+
+/* method */
+.method { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px 32px; }
+.method > div { display: grid; gap: 8px; align-content: start; }
+.method ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--ink-2); max-width: 68ch; }
+.audit { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.audit div { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; }
+.audit b { font: 500 1.4rem var(--f-mono); font-variant-numeric: tabular-nums; }
+.audit span { font-size: 0.8rem; color: var(--ink-2); }
+footer { font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
+
+@media (max-width: 860px) {
+  .desk { grid-template-columns: minmax(0, 1fr); }
+  .listpane { position: static; }
+  .list { max-height: 300px; }
+  .answers, .prompt-pair { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .wrap { padding-block: 28px 48px; gap: 48px; }
+  .round { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .round-n { display: flex; gap: 8px; align-items: center; }
+  .statement q { font-size: 1.18rem; }
+  .tab { padding: 10px 10px 9px; }
+  .tab .tab-sub { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .item, .chip, .tab { transition: background-color 0.12s, color 0.12s; }
+}
+</style>
+
+<main class="wrap">
+  <header class="intro">
+    <div class="eyebrow">News provenance tracer &middot; English-language news, January to April 2020</div>
+    <h1>Who reported it first?</h1>
+    <p class="lede">A story says someone said something, or that something happened. Which outlet had it first? This tracer takes one sentence from a news story and the time it was published, searches everything published before then, and names the earliest report that carried the same quote or the same event.</p>
+    <p>It works on two archives. For quotes it uses Quotebank, which records every quotation found in millions of 2020 news articles with its outlet and time. For events it uses headlines collected by GDELT, which logs news articles as it finds them. A self-improvement loop then tuned the tracer's settings against a benchmark whose answers are known. Every example below comes from held-out items the loop never saw.</p>
+    <ol class="steps">
+      <li><b>Search</b><span>Full-text search over quotes or headlines published before the story, ranked by word overlap.</span></li>
+      <li><b>Check</b><span>A small, fast model (Claude Haiku) reads the top candidates and keeps the ones that say the same thing as the sentence.</span></li>
+      <li><b>Date</b><span>Every article that carried a kept quote or headline goes on a timeline. The earliest one is the answer.</span></li>
+    </ol>
+  </header>
+
+  <section id="browser" aria-labelledby="browser-h">
+    <div class="stack">
+      <div class="eyebrow">Tracer browser</div>
+      <h2 id="browser-h">Forty traced examples per archive</h2>
+      <p class="muted">Each example is a sentence from a later news report. The tracer sees only that sentence and the time of that report. Pick one to see its answer, the true first report, and how the story spread.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Archive">
+      <button class="tab" role="tab" id="tab-quotes" aria-controls="panel" aria-selected="true" data-task="quotes">Quotes<span class="tab-sub">Quotebank 2020</span></button>
+      <button class="tab" role="tab" id="tab-events" aria-controls="panel" aria-selected="false" data-task="events">Events<span class="tab-sub">GDELT 2020 headlines</span></button>
+    </div>
+    <div id="panel" role="tabpanel" class="stack" aria-labelledby="tab-quotes">
+      <div class="taskline">
+        <p id="task-blurb" class="small"></p>
+        <div class="score" id="task-score"></div>
+      </div>
+      <div class="desk">
+        <div class="listpane">
+          <div class="controls">
+            <input type="search" id="q" placeholder="Search text or outlet" aria-label="Search examples">
+            <select id="filter" aria-label="Filter examples">
+              <option value="all">All</option>
+              <option value="fixed">Fixed by the loop</option>
+              <option value="right">Tracer right</option>
+              <option value="wrong">Tracer wrong</option>
+            </select>
+          </div>
+          <div class="count" id="count"></div>
+          <ul class="list" id="list"></ul>
+        </div>
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="loop" aria-labelledby="loop-h">
+    <div class="stack">
+      <div class="eyebrow">Self-improvement loop</div>
+      <h2 id="loop-h">How the tracer tuned itself</h2>
+      <p>Each round, a large model (Claude Opus) reads the tracer's current settings and the cases it got wrong on the training items, then proposes up to three small changes: a different search, more candidates, rewritten instructions for the checker. Cheap screens weed out the weak ones. The best one or two are scored on all training items, and one is kept only if it fixes clearly more items than it breaks (more than run-to-run noise) and does not do worse on the validation items. The watch set and the test set stay out of the loop.</p>
+    </div>
+    <div id="loop-quotes" class="loop-task"></div>
+    <div id="loop-events" class="loop-task"></div>
+  </section>
+
+  <section id="method" aria-labelledby="method-h">
+    <div class="stack">
+      <div class="eyebrow">Method and caveats</div>
+      <h2 id="method-h">How the answers are known, and what they miss</h2>
+    </div>
+    <div class="method">
+      <div>
+        <h3>Quotes: ground truth from the archive itself</h3>
+        <ul>
+          <li>Benchmark items are quotes carried by at least five outlets. The sentence the tracer gets is a reworded version of a later outlet's report; the answer is the earliest timed mention of that quote before it.</li>
+          <li>Near-identical versions of the same quote by the same speaker count as the same quote, so an earlier rendering is a correct answer, not a false one.</li>
+          <li>Quotebank keeps the quote, a short passage around it, the outlet, the URL and the time. It has no full article text, so the tracer can follow quotes but not facts reported without one.</li>
+          <li>AP and Reuters' own sites are missing from Quotebank, so the &ldquo;first&rdquo; outlet is often the fastest site that ran wire copy.</li>
+          <li>Mentions with only a date and no time of day are shown but never ranked as first.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Events: labelled by a model, then audited</h3>
+        <ul>
+          <li>There is no official record of who reported an event first, so the answers are model-made. Claude Sonnet 5.5 (low effort) labelled each event's first report from the headlines GDELT saw in the days before the story. An answer counts as right if it is in the first wave: the labelled first report or a report of the same event within 30 minutes after it.</li>
+          <li>A label can only be as early as the headlines the labeller was shown. So every answer that came out earlier than the label went back to the same labeller: the answers of every config the loop scored in full (on train and validation), and of the baseline and the final settings on every split, including test and watch, so those two are scored on the same footing. This is ground truth <span id="gt-v">v3.3</span>.</li>
+          <li>The ground truth is therefore only as good as the labeller. An independent audit by Claude Fable agreed with 9 in 10 of the reviews it re-judged (below), so every event score here carries some label error.</li>
+          <li>GDELT times are when GDELT's crawler first saw an article, in 15-minute steps (UTC), not when it was published. They are an upper bound, and reports found in the same 15-minute step cannot be told apart.</li>
+        </ul>
+        <div class="audit" id="audit"></div>
+        <p class="small muted" id="audit-text"></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div id="built"></div>
+    <div>Data: Quotebank (Vaucher et al., WSDM 2021), CC BY 4.0. Event headlines from the <a href="https://www.gdeltproject.org/" target="_blank" rel="noopener">GDELT Project</a>. Article links go to the original outlets and may have moved or expired since 2020.</div>
+  </footer>
+</main>
+
+<script>
+var DEMO_DATA = __DEMO_DATA__;
+
+(function () {
+  "use strict";
+  var DATA = DEMO_DATA;
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var state = { task: "quotes", sel: { quotes: null, events: null }, line: { quotes: "main", events: "main" } };
+  try { var saved = localStorage.getItem("wrif-task"); if (saved === "quotes" || saved === "events") state.task = saved; } catch (e) { /* storage unavailable */ }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function parse(t) { // "2020-03-23T15:40" -> Date (treated as UTC)
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(t || "");
+    return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0))) : null;
+  }
+  function fmt(t, withYear) {
+    var d = parse(t); if (!d) return "";
+    var s = d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + (withYear ? " " + d.getUTCFullYear() : "");
+    return s + ", " + String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0");
+  }
+  function day(t) { var d = parse(t); return d ? d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] : ""; }
+  function pct(x) { return x == null ? "—" : (100 * x).toFixed(1) + "%"; }
+  function gap(a, b) { // human gap from a to b (b later)
+    var m = Math.round((parse(b) - parse(a)) / 60000), s = m < 0 ? "-" : "";
+    m = Math.abs(m);
+    if (m < 60) return s + m + " min";
+    if (m < 2880) return s + (m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, "") + " h";
+    return s + Math.round(m / 1440) + " days";
+  }
+  var VERDICT = {
+    right: ["Right", "ok"], early: ["Too early: wrong match", "bad"], late: ["Too late: missed the first report", "warn"],
+    none: ["Nothing found", "neutral"]
+  };
+  function pill(v, prefix) { var x = VERDICT[v]; return '<span class="pill ' + x[1] + '">' + esc((prefix || "") + x[0]) + "</span>"; }
+  function short(v) { return { right: "right", early: "too early", late: "too late", none: "nothing" }[v]; }
+  function link(url, text) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(text) + "</a>"; }
+  function version(path) { var m = /(v\d+|final)\.json$/.exec(path || ""); return m ? m[1] : path; }
+  function bestWord(T) { return T.reselect ? "final" : "best"; }
+
+  var BLURB = {
+    quotes: "A reworded statement of what someone said → the first outlet that carried the quote. Times as recorded by Quotebank.",
+    events: "A one-sentence report of an event → the first article GDELT saw that reported it. Times are when GDELT’s crawler found each article (UTC, 15-minute steps), not publication times. Answers are checked against model-made labels."
+  };
+
+  // ---------- browser ----------
+  var listEl = document.getElementById("list"), detailEl = document.getElementById("detail");
+  var qEl = document.getElementById("q"), filterEl = document.getElementById("filter");
+
+  function haystack(ex) {
+    var parts = [ex.statement, ex.speaker, ex.source_outlet, ex.gt.outlet, ex.gt.title, ex.best.first && ex.best.first.outlet,
+      ex.best.first && ex.best.first.title];
+    return parts.join(" ").toLowerCase();
+  }
+  function visible() {
+    var T = DATA[state.task], q = qEl.value.trim().toLowerCase(), f = filterEl.value;
+    return T.examples.filter(function (ex) {
+      if (q && q.split(/\s+/).some(function (w) { return haystack(ex).indexOf(w) < 0; })) return false;
+      if (f === "fixed") return ex.best.correct && !ex.base.correct;
+      if (f === "right") return ex.best.correct;
+      if (f === "wrong") return !ex.best.correct;
+      return true;
+    });
+  }
+  function renderTask() {
+    var T = DATA[state.task];
+    document.querySelectorAll(".tab").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.task === state.task)); });
+    document.getElementById("panel").setAttribute("aria-labelledby", "tab-" + state.task);
+    document.getElementById("task-blurb").textContent = BLURB[state.task];
+    var w = T.watch;
+    document.getElementById("task-score").innerHTML =
+      "<span>Whole watch set (" + w.n + " items): " + bestWord(T) + " <b>" + pct(w.best) + "</b></span>" +
+      "<span>baseline <b>" + pct(w.base) + "</b></span>" +
+      "<span>fixed <b>" + w.fixed + "</b> &middot; broke <b>" + w.broken + "</b></span>";
+    renderList();
+  }
+  function renderList() {
+    var T = DATA[state.task], items = visible();
+    document.getElementById("count").textContent = items.length + " of " + T.examples.length + " examples";
+    if (!state.sel[state.task]) {
+      var first = T.examples.find(function (e) { return e.best.correct && !e.base.correct; }) || T.examples[0];
+      state.sel[state.task] = first && first.id;
+    }
+    listEl.innerHTML = items.map(function (ex) {
+      var b = ex.best, base = ex.base;
+      return '<li><button class="item" data-id="' + esc(ex.id) + '" aria-current="' + (ex.id === state.sel[state.task]) + '">' +
+        '<span class="item-text">' + esc(ex.statement) + "</span>" +
+        '<span class="item-meta">' + '<span class="pill ' + VERDICT[b.verdict][1] + '">' + esc(b.correct ? "Right" : short(b.verdict)) + "</span>" +
+        (b.correct !== base.correct ? '<span class="pill ' + (b.correct ? "accent" : "bad") + '">' + (b.correct ? "fixed by loop" : "broken by loop") + "</span>" : "") +
+        "<span>as of " + esc(fmt(ex.as_of)) + "</span></span></button></li>";
+    }).join("") || '<li class="item small muted">No examples match. Clear the search or pick another filter.</li>';
+    var cur = T.examples.find(function (e) { return e.id === state.sel[state.task]; });
+    renderDetail(cur);
+  }
+  listEl.addEventListener("click", function (e) {
+    var b = e.target.closest(".item[data-id]"); if (!b) return;
+    state.sel[state.task] = b.dataset.id;
+    listEl.querySelectorAll(".item").forEach(function (x) { x.setAttribute("aria-current", String(x === b)); });
+    renderDetail(DATA[state.task].examples.find(function (ex) { return ex.id === b.dataset.id; }));
+    if (window.matchMedia("(max-width: 860px)").matches) detailEl.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+  qEl.addEventListener("input", renderList);
+  filterEl.addEventListener("change", renderList);
+  document.querySelectorAll(".tab").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.task = b.dataset.task;
+      try { localStorage.setItem("wrif-task", state.task); } catch (e) { /* storage unavailable */ }
+      renderTask();
+    });
+    b.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        var other = document.querySelector('.tab:not([data-task="' + b.dataset.task + '"])');
+        other.focus(); other.click();
+      }
+    });
+  });
+
+  function renderDetail(ex) {
+    if (!ex) { detailEl.innerHTML = '<p class="muted">Pick an example from the list.</p>'; return; }
+    var T = DATA[state.task], isQ = state.task === "quotes", b = ex.best, f = b.first, g = ex.gt, base = ex.base;
+    var bestV = T.best_label || version(T.best_config), baseV = T.base_label || version(T.base_config);
+    var h = '<div class="statement"><div class="card-label">Statement given to the tracer</div><q>' + esc(ex.statement) + "</q>" +
+      '<div class="meta">As of <time>' + esc(fmt(ex.as_of, true)) + "</time> &middot; reworded from a later report by " +
+      (ex.source_url ? link(ex.source_url, ex.source_outlet || "the source") : esc(ex.source_outlet || "")) + "</div></div>";
+
+    // tracer card
+    h += '<div class="answers"><div class="card tracer"><div class="card-head"><span class="card-label">Tracer’s first report (' + esc(bestV) + ")</span>" + pill(b.verdict) + "</div>";
+    if (f) {
+      h += '<div class="when">' + esc(fmt(f.date, true)) + (f.timed === false ? " (date only)" : "") + "</div>" +
+        '<div class="outlet">' + link(f.url, f.outlet) + (f.kind && f.kind !== "outlet" ? ' <span class="pill neutral">' + esc(f.kind.replace("_", " ")) + "</span>" : "") + "</div>" +
+        (f.title ? '<div class="headline">' + esc(f.title) + "</div>" : "") +
+        (f.quote ? '<div class="quote">“' + esc(f.quote) + "”</div>" : "");
+      if (!b.correct && f.date && g.date) {
+        var early = f.date < g.date;
+        h += '<div class="small muted">' + esc(gap(early ? f.date : g.date, early ? g.date : f.date)) + (early ? " before" : " after") + " the true first report.</div>";
+      }
+      if (b.tie) h += '<div class="small muted">Different article, same timestamp as the true first report (a syndicated copy), so it counts.</div>';
+      if (b.adjudicated === false) h += '<div class="small muted">The labeller reviewed this earlier report and judged it a different event.</div>';
+    } else {
+      h += '<div class="muted">No ' + (isQ ? "quote" : "headline") + " published before then was judged to say the same thing.</div>";
+    }
+    h += '<div class="baseline"><span class="card-label">Baseline (' + esc(baseV) + ")</span>" +
+      (base.first ? "<span><time>" + esc(fmt(base.first.date)) + "</time> &middot; " + link(base.first.url, base.first.outlet) + "</span>" : "<span>No match.</span>") +
+      "<span>" + pill(base.verdict) + (base.correct !== b.correct ? " " + (b.correct ? '<span class="pill accent">fixed by the loop</span>' : '<span class="pill bad">broken by the loop</span>') : "") + "</span></div>";
+    h += "</div>";
+
+    // truth card
+    h += '<div class="card truth"><div class="card-head"><span class="card-label">True first report</span><span class="pill neutral">' + (isQ ? "from Quotebank" : "labelled") + "</span></div>" +
+      '<div class="when">' + esc(fmt(g.date, true)) + "</div>" +
+      '<div class="outlet">' + link(g.url, g.outlet) + "</div>" +
+      (g.title ? '<div class="headline">' + esc(g.title) + "</div>" : "") +
+      (g.quote ? '<div class="quote">“' + esc(g.quote) + "”</div>" : "") +
+      (!isQ && g.wave > 1 ? '<div class="small muted">' + (g.wave - 1) + " more report" + (g.wave > 2 ? "s" : "") + " within 30 minutes also count as first.</div>" : "") +
+      '<div class="small muted">' + esc(gap(g.date, ex.as_of)) + " before the story the statement came from.</div></div></div>";
+
+    // timeline
+    h += '<div class="stack"><div class="block-title"><h3>How it spread</h3><div class="legend">' +
+      '<span><i class="lg-first"></i>Tracer’s first report</span><span><i class="lg-gt"></i>True first report</span>' +
+      (isQ ? '<span><i class="lg-other"></i>Other outlets</span><span><i class="lg-hollow"></i>Date only</span>'
+           : '<span><i class="lg-wave"></i>Also counts as first</span><span><i class="lg-other"></i>Other outlets</span>') +
+      "</div></div>" + timeline(ex) +
+      '<div class="small muted">First appearance at each outlet, from the tracer’s matched ' + (isQ ? "quotes" : "headlines") + " (" + b.n_mentions + " " + (isQ ? "mentions" : "articles") + " across " + b.n_outlets + " outlets" +
+      (ex.spread_more ? "; the earliest 30 shown" : "") + "). Horizontal axis: time after the earliest report shown, on a log scale.</div></div>";
+
+    // matches
+    h += '<div class="stack"><h3>What the checker kept</h3><div class="facts"><span>' + b.n_candidates + " candidates searched</span><span>" + b.n_matched + " kept</span><span>" + b.calls + " checker call" + (b.calls === 1 ? "" : "s") + "</span><span>baseline kept " + base.n_matched + "</span></div>";
+    if (b.matched.length) {
+      h += '<ul class="matches">' + b.matched.map(function (m) {
+        return "<li><div class=\"m-meta\">" + (m.gt ? '<span class="pill ok">' + (isQ ? "the true quote" : "first-wave headline") + "</span>" : "") +
+          (isQ ? "<span>" + esc(m.speaker) + "</span><span>first seen <time>" + esc(day(m.date)) + "</time></span><span>" + m.articles + " articles</span>"
+               : "<span>" + esc(m.outlet) + "</span><span><time>" + esc(fmt(m.date)) + "</time></span>" + (m.copies ? "<span>+" + m.copies + " copies</span>" : "")) +
+          '</div><div class="m-text">' + (isQ ? "“" + esc(m.text) + "”" : esc(m.title)) + "</div></li>";
+      }).join("") + "</ul>";
+      if (b.n_matched > b.matched.length) h += '<div class="small muted">and ' + (b.n_matched - b.matched.length) + " more.</div>";
+    } else {
+      h += '<div class="note">The checker kept none of the candidates.</div>';
+    }
+    h += "</div>";
+    detailEl.innerHTML = h;
+  }
+
+  function timeline(ex) {
+    var rows = ex.spread;
+    if (!rows.length) return '<div class="note">Nothing to plot: no matched ' + (state.task === "quotes" ? "quote" : "headline") + ".</div>";
+    var W = 740, X0 = 280, X1 = W - 24, RH = 22, TOP = 34, H = TOP + rows.length * RH + 12;
+    var t0 = Math.min.apply(null, rows.map(function (r) { return parse(r.t).getTime(); }));
+    var mins = rows.map(function (r) { return (parse(r.t).getTime() - t0) / 60000; });
+    var M = Math.max(30, Math.max.apply(null, mins));
+    var L = Math.log1p(M);
+    function x(m) { return X0 + (X1 - X0) * Math.log1p(Math.max(0, m)) / L; }
+    var ticks = [[0, "0"], [15, "15 min"], [60, "1 h"], [360, "6 h"], [1440, "1 day"], [4320, "3 days"], [10080, "1 week"], [20160, "2 weeks"], [43200, "30 days"]]
+      .filter(function (t) { return t[0] <= M * 1.05; });
+    var s = '<div class="scroller"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Spread timeline, first appearance per outlet">';
+    s += '<text class="sv-axis" x="0" y="18">TIME</text><text class="sv-axis" x="104" y="18">OUTLET</text>';
+    ticks.forEach(function (t, i) {
+      var tx = x(t[0]);
+      s += '<line class="sv-grid" x1="' + tx + '" x2="' + tx + '" y1="' + (TOP - 8) + '" y2="' + (H - 6) + '"/>';
+      s += '<text class="sv-axis" x="' + tx + '" y="18" text-anchor="' + (i === 0 ? "start" : tx > X1 - 30 ? "end" : "middle") + '">' + t[1] + "</text>";
+    });
+    rows.forEach(function (r, i) {
+      var y = TOP + i * RH + RH / 2, cx = x(mins[i]);
+      if (r.first) s += '<rect class="sv-band" x="0" y="' + (y - RH / 2 + 1) + '" width="' + W + '" height="' + (RH - 2) + '" rx="4"/>';
+      else if (r.gt) s += '<rect class="sv-band-gt" x="0" y="' + (y - RH / 2 + 1) + '" width="' + W + '" height="' + (RH - 2) + '" rx="4"/>';
+      s += '<text class="sv-time" x="6" y="' + (y + 4) + '">' + esc(r.timed === false ? day(r.t) + ", no time" : fmt(r.t)) + "</text>";
+      var name = r.o.length > 30 ? r.o.slice(0, 29) + "…" : r.o;
+      s += '<a href="' + esc(r.u) + '" target="_blank" rel="noopener"><text class="sv-outlet' + (r.first ? " is-first" : r.gt ? " is-gt" : "") + '" x="104" y="' + (y + 4) + '">' + esc(name) +
+        (r.extra ? " (not in tracer’s matches)" : "") + "<title>" + esc(r.o) + "</title></text></a>";
+      s += '<line class="sv-stem" x1="' + X0 + '" x2="' + cx + '" y1="' + y + '" y2="' + y + '"/>';
+      if (r.first) s += '<circle class="sv-first" cx="' + cx + '" cy="' + y + '" r="6"/>';
+      else s += '<circle class="sv-dot' + (r.timed === false ? " hollow" : r.wave ? " wave" : "") + '" cx="' + cx + '" cy="' + y + '" r="4"/>';
+      if (r.gt) s += '<circle class="sv-gt" cx="' + cx + '" cy="' + y + '" r="9.5"/>';
+    });
+    return s + "</svg></div>";
+  }
+
+  // ---------- loop ----------
+  var LINE_NAMES = { main: "Main line (all settings)", retrieval: "Search settings only", verify: "Checker settings only", hard: "Harder queries (from v3)" };
+  var SPLITS = [["train", "Train"], ["val", "Validation"], ["watch", "Watch set (held out, never seen by the loop)"], ["test", "Test (scored once, at the end)"]];
+  var DECISION = { accepted: ["Kept", "ok"], rejected: ["Rejected", "neutral"], runner_up: ["Runner-up", "neutral"], not_evaluated: ["Not scored", "neutral"], invalid: ["Invalid", "neutral"] };
+
+  function resultsTable(T) {
+    var bv = T.best_label || version(T.best_config), b0 = T.base_label || version(T.base_config);
+    var bestHead = T.reselect ? "Final" + (bv === "final" ? "" : " " + bv) : "Best " + bv;
+    var h = '<div class="scroller"><table><thead><tr><th>Split</th><th class="num">Baseline ' + esc(b0) + '</th><th class="num">' + esc(bestHead) + '</th><th class="num">Change</th><th>Notes</th></tr></thead><tbody>';
+    SPLITS.forEach(function (sp) {
+      var r = T.results[sp[0]], a = r.base, b = r.best;
+      var n = (b && b.n) || (a && a.n);
+      var note = "";
+      var bestCell;
+      if (b && b.score != null) bestCell = pct(b.score);
+      else if (sp[0] === "test" && T.same_config && a) bestCell = pct(a.score);
+      else bestCell = '<span class="muted">' + (sp[0] === "test" ? "not scored yet" : "—") + "</span>";
+      var bs = b && b.score != null ? b.score : (T.same_config && a ? a.score : null);
+      var d = a && bs != null ? bs - a.score : null;
+      if (b && b.ci95) note = "95% CI " + pct(b.ci95[0]) + "–" + pct(b.ci95[1]) + ". ";
+      if (b && b.fixed_broken) note += b.fixed_broken[0] + " items fixed, " + b.fixed_broken[1] + " broken. ";
+      if (sp[0] === "test" && b && b.recall_at_k != null && a && a.recall_at_k != null)
+        note += "Answer among the candidates the checker saw: " + pct(b.recall_at_k) + " (baseline " + pct(a.recall_at_k) + "). Checker calls per item: " +
+          b.calls_per_claim.toFixed(1) + " (baseline " + a.calls_per_claim.toFixed(1) + ").";
+      if (T.reselect && (sp[0] === "train" || sp[0] === "val"))
+        note = sp[0] === "train" ? "Ground truth v" + T.reselect.gt_version + ". Final = best of " + T.reselect.n_configs + " configs on train + validation combined, so this lead is optimistic."
+                                 : "Same post-hoc pick, so also optimistic.";
+      if (T.reselect && sp[0] === "watch") note = "Never used to choose anything.";
+      if (sp[0] === "test" && !(b && b.score != null) && !T.same_config) note = "The test set is scored once, when the loop has finished.";
+      h += "<tr" + (sp[0] === "test" || sp[0] === "watch" ? ' class="key"' : "") + "><td class=\"split\">" + esc(sp[1]) + (n ? ' <span class="muted small">(' + n + ")</span>" : "") + '</td><td class="num">' + (a ? pct(a.score) : "—") +
+        '</td><td class="num">' + bestCell + '</td><td class="num ' + (d > 0.0005 ? "delta-up" : d < -0.0005 ? "delta-down" : "") + '">' + (d == null ? "" : (d > 0 ? "+" : d < 0 ? "−" : "±") + (100 * Math.abs(d)).toFixed(1) + " pts") +
+        '</td><td class="small notes">' + esc(note) + "</td></tr>";
+    });
+    return h + "</tbody></table></div>";
+  }
+
+  function loopChart(L, metricName) {
+    var pts = [];
+    L.rounds.forEach(function (r) {
+      var ev = r.proposals.filter(function (p) { return p.train != null; });
+      ev.forEach(function (p, i) { pts.push({ x: r.round + (ev.length > 1 ? (i - (ev.length - 1) / 2) * 0.18 : 0), y: p.train, acc: p.decision === "accepted" }); });
+    });
+    var ser = L.series;
+    if (!ser.length) return '<div class="note">This line has no baseline yet.</div>';
+    var maxR = Math.max(1, L.n_rounds || 0, ser[ser.length - 1].round, pts.length ? Math.max.apply(null, pts.map(function (p) { return p.x; })) : 0);
+    var ys = pts.map(function (p) { return p.y; }).concat(ser.map(function (s) { return s.train; }), ser.map(function (s) { return s.val; }));
+    var lo = Math.floor(Math.min.apply(null, ys) * 10) / 10, hi = Math.ceil(Math.max.apply(null, ys) * 10) / 10;
+    if (hi - lo < 0.2) { hi = Math.min(1, lo + 0.2); lo = hi - 0.2; }
+    var W = 1000, H = 300, X0 = 46, X1 = W - 70, Y0 = H - 34, Y1 = 22;
+    function X(r) { return X0 + (X1 - X0) * (r / (maxR + 0.4)); }
+    function Y(v) { return Y0 - (Y0 - Y1) * (v - lo) / (hi - lo); }
+    var s = '<div class="scroller"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(metricName) + ' by round">';
+    for (var v = lo; v <= hi + 1e-9; v += 0.1) {
+      s += '<line class="sv-grid" x1="' + X0 + '" x2="' + X1 + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/><text class="sv-axis" x="' + (X0 - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + Math.round(v * 100) + "%</text>";
+    }
+    for (var r = 0; r <= maxR; r++) {
+      s += '<text class="sv-axis" x="' + X(r) + '" y="' + (Y0 + 18) + '" text-anchor="middle">' + (r === 0 ? (L.start ? version(L.start.from) : "base") : r) + "</text>";
+    }
+    s += '<text class="sv-axis" x="' + X1 + '" y="' + (H - 2) + '" text-anchor="end">round</text>';
+    L.marks.forEach(function (m) {
+      s += '<line class="sv-mark" x1="' + X(m.round) + '" x2="' + X(m.round) + '" y1="' + (Y1 - 6) + '" y2="' + Y0 + '"/>' +
+        (X(m.round) > W - 300 ? '<text class="sv-mark-label" x="' + (X(m.round) - 5) + '" y="' + (Y1 + 2) + '" text-anchor="end">'
+                              : '<text class="sv-mark-label" x="' + (X(m.round) + 5) + '" y="' + (Y1 + 2) + '">') + esc(m.note) + "</text>";
+    });
+    function step(key) {
+      var d = "", last = null;
+      ser.forEach(function (p, i) {
+        var px = X(p.round), py = Y(p[key]);
+        d += i === 0 ? "M" + px + " " + py : " H" + px + " V" + py;
+        last = p;
+      });
+      return d + " H" + X(maxR);
+    }
+    s += '<path class="sv-val" d="' + step("val") + '"/><path class="sv-inc" d="' + step("train") + '"/>';
+    pts.forEach(function (p) {
+      s += p.acc ? '<circle class="sv-acc" cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="5.5"/>' : '<circle class="sv-rej" cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="4.5"/>';
+    });
+    var end = ser[ser.length - 1];
+    s += '<text class="sv-label-acc" x="' + (X(maxR) + 6) + '" y="' + (Y(end.train) + 4) + '">' + pct(end.train) + "</text>";
+    s += '<text class="sv-label" x="' + (X(maxR) + 6) + '" y="' + (Y(end.val) + (Math.abs(Y(end.val) - Y(end.train)) < 12 ? (end.val < end.train ? 16 : -8) : 4)) + '">' + pct(end.val) + "</text>";
+    return s + "</svg></div>";
+  }
+
+  function roundList(L, T) {
+    var gtv = T.reselect ? T.reselect.gt_version : "";
+    if (!L.rounds.length) return '<p class="muted">No rounds have finished on this line yet.</p>';
+    return '<ol class="rounds">' + L.rounds.map(function (r) {
+      var ev = r.proposals.filter(function (p) { return p.train != null || p.decision === "accepted"; });
+      var other = r.proposals.filter(function (p) { return ev.indexOf(p) < 0; });
+      var kept = r.accepted === true || ev.some(function (p) { return p.decision === "accepted"; });
+      var h = '<li class="round"><div class="round-n">Round ' + r.round + (kept ? '<span class="pill ok">change kept</span>' : r.accepted === false ? '<span class="pill neutral">no change</span>' : '<span class="pill neutral">not finished</span>') + '</div><div class="props">';
+      ev.forEach(function (p) {
+        var d = DECISION[p.decision] || [p.decision, "neutral"];
+        h += '<div class="prop"><div class="prop-change">' + esc(p.changes.join("; ")) + ' <span class="pill ' + d[1] + '">' + esc(d[0]) + "</span>" +
+          (p.final_pick ? ' <span class="pill accent">picked as final after re-scoring</span>' : "") + "</div>" +
+          '<div class="prop-stats">train ' + pct(p.train) + (p.train_n ? " of " + p.train_n : "") + (p.fixed != null ? " · fixed " + p.fixed + ", broke " + p.broken : "") + (p.val != null ? " · val " + pct(p.val) : "") + "</div>" +
+          (p.rescored ? '<div class="prop-stats">re-scored on ground truth v' + esc(gtv) + ": train " + pct(p.rescored.train) + " · val " + pct(p.rescored.val) + "</div>" : "") +
+          '<div class="prop-why">' + esc(p.reason) + "</div>";
+        if (p.decision === "accepted" && p.rationale) h += '<div class="prop-why"><b>Why the model proposed it:</b> ' + esc(p.rationale) + "</div>";
+        if (p.prompt_new) {
+          h += "<details><summary>Show the checker instructions before and after</summary><div class=\"prompt-pair\"><div><div class=\"card-label\" style=\"margin-top:8px\">Before</div><pre>" + esc(p.prompt_old || "") + "</pre></div><div><div class=\"card-label\" style=\"margin-top:8px\">After</div><pre>" + esc(p.prompt_new) + "</pre></div></div></details>";
+        }
+        h += "</div>";
+      });
+      if (other.length) {
+        h += '<details class="screened"><summary>' + other.length + " proposal" + (other.length > 1 ? "s" : "") + " stopped at the screen</summary><ul>" +
+          other.map(function (p) { return "<li>" + esc(p.changes.join("; ")) + " — " + esc(p.reason) + "</li>"; }).join("") + "</ul></details>";
+      }
+      if (!r.proposals.length) h += '<div class="screened">No proposals logged.</div>';
+      return h + "</div></li>";
+    }).join("") + "</ol>";
+  }
+
+  function signP(a, b) { // two-sided exact sign test on a wins vs b losses
+    var n = a + b, k = Math.min(a, b), c = 1, sum = 0;
+    for (var i = 0; i <= k; i++) { sum += c; c = c * (n - i) / (i + 1); }
+    return Math.min(1, 2 * sum / Math.pow(2, n));
+  }
+  function eventStory(T) {
+    var R = T.reselect, lines = T.lines.map(function (l) {
+      var kept = l.rounds.reduce(function (n, r) { return n + r.proposals.filter(function (p) { return p.decision === "accepted"; }).length; }, 0);
+      return { name: { main: "the main line (all settings)", retrieval: "a line limited to search settings" }[l.name] || l.name, rounds: l.rounds.length, kept: kept };
+    });
+    var G = DATA.gt_review || {};
+    var t = T.results.test, w = T.results.watch;
+    var h = "<p>Two loop lines ran on this task: " + lines.map(function (l) { return esc(l.name) + ", " + l.rounds + " rounds, " + l.kept + " change" + (l.kept === 1 ? "" : "s") + " kept"; }).join("; and ") +
+      ". The main line stopped after round " + lines[0].rounds + " when its Haiku budget ran out. Both lines made their decisions on ground truth v3.2, keeping a change only if it fixed at least 3 more training items than it broke.</p>";
+    h += "<p>The ground truth was then revised to v" + esc(R.gt_version) + ": the labeller reviewed every answer that came out earlier than the label, from all the configs the loop had scored in full, and accepted " + (G.accepted != null ? G.accepted + " of " + G.reviewed : "some of them") + " as genuine earlier reports. All " + R.n_configs +
+      " of those configs were re-scored on train and validation only. The best on the two combined became the final settings (" + esc(R.changes.join("; ")) + "), a proposal from round " + esc(R.winner_old.round) + " of the " + esc(String(R.winner_old.line).toLowerCase()) + " line that had been " +
+      esc(R.winner_old.decision || "rejected") + " under the old ground truth" + (/net [+−-]?\d+/.test(R.winner_old.reason || "") ? " (train " + esc(/net [+−-]?\d+/.exec(R.winner_old.reason)[0]) + ", below the bar)" : "") + ". The choice used only train and validation scores on ground truth v3.3; the test set then gave its one official score, for these settings and the baseline" +
+      (R.final_logged_first ? " (the ledger happens to log the test entry a few seconds before the re-selection note)" : "") + ".</p>";
+    if (t && t.best && t.base) {
+      h += "<p>On the held-out test set the final settings score " + pct(t.best.score) + " against " + pct(t.base.score) + " for the baseline" +
+        (t.best.fixed_broken ? " (" + t.best.fixed_broken[0] + " items fixed, " + t.best.fixed_broken[1] + " broken; two-sided sign test p ≈ " + signP(t.best.fixed_broken[0], t.best.fixed_broken[1]).toFixed(3) + ")" : "") +
+        (w && w.best ? ", and " + pct(w.best.score) + " against " + pct(w.base.score) + " on the watch set" : "") +
+        ". All of the gain comes from a wider search; no change to the checker or its instructions helped. Picking the best of " + R.n_configs +
+        " configs after the fact carries some winner’s-curse optimism on train and validation, which is why the test and watch numbers are the ones to trust.</p>";
+    }
+    var after = T.after || [], F = after.filter(function (e) { return e.type === "fix"; }).pop(),
+        X = after.filter(function (e) { return e.type === "experiment"; }).pop();
+    if (F) {
+      var ft = F.results.test, fw = F.results.watch;
+      h += "<p><strong>After the loop.</strong> Looking at held-out misses showed three problems, fixed by hand. Same-event answers inside the 30-minute first wave that the labeller had never seen were scored late; ground truth v" + esc(F.gt_version) +
+        " sends those to the labeller too, for every config’s answers. Reworded statements missed first reports worded differently; the tracer now also searches with a Haiku rewrite of the statement as a headline. And the checker accepts earlier occurrences of recurring events; a stricter prompt lost more true matches than it saved and was not kept. Chosen on train and validation only and scored on ground truth v" + esc(F.gt_version) + ", the fixed tracer scores " +
+        pct(ft.fix) + " on test against " + pct(ft.v0) + " for the baseline and " + pct(ft.final_k60) + " for the loop’s final settings (" + ft.fix_vs_v0[0] + " fixed, " + ft.fix_vs_v0[1] + " broken against the baseline), and " +
+        pct(fw.fix) + " on watch. The fixes came from looking at held-out examples, so this test number is less clean than the loop’s. The offline demo page (demo.html) uses the fixed tracer; the examples on this page use the loop’s final settings.</p>";
+    }
+    if (X) h += "<p>Tried afterwards and not kept: local models in place of Haiku as the checker (classifiers on word, number, timing and embedding features, and local language models up to 80B parameters) all did clearly worse, because they accept earlier occurrences of similar events; and a second Haiku check anchored on the first check’s matches was within noise for about 3 more calls per item.</p>";
+    return h;
+  }
+
+  function reselectTable(T) {
+    var R = T.reselect, rows = R.rows, TOP = 6;
+    function row(r) {
+      return "<tr" + (r.winner ? ' class="key"' : "") + '><td class="settings">' + esc(r.settings.join("; ")) + (r.winner ? ' <span class="pill accent">final</span>' : "") +
+        '<div class="small muted">' + esc(r.origin) + (r.old_decision && r.old_decision !== "baseline" ? " · " + esc((DECISION[r.old_decision] || [r.old_decision])[0].toLowerCase()) + " in the loop" : "") + "</div></td>" +
+        '<td class="num">' + pct(r.train) + '</td><td class="num">' + pct(r.val) + '</td><td class="num">' + (r.items == null ? "—" : r.items + " / " + (R.n_train + R.n_val)) + "</td></tr>";
+    }
+    var head = '<thead><tr><th>Settings (change from the baseline)</th><th class="num">Train</th><th class="num">Validation</th><th class="num">Right, both</th></tr></thead>';
+    var h = '<div class="stack"><h3 style="font-size:1.05rem">How the final settings were picked</h3>' +
+      '<p class="small muted">Every config the loop scored in full, re-scored on ground truth v' + esc(R.gt_version) + " (train " + R.n_train + " items, validation " + R.n_val + "). No test data was used.</p>" +
+      '<div class="scroller"><table>' + head + "<tbody>" + rows.slice(0, TOP).map(row).join("") + "</tbody></table></div>";
+    if (rows.length > TOP) h += "<details><summary>Show the other " + (rows.length - TOP) + ' configs</summary><div class="scroller" style="margin-top:8px"><table>' + head + "<tbody>" + rows.slice(TOP).map(row).join("") + "</tbody></table></div></details>";
+    return h + "</div>";
+  }
+
+  function renderLoop(task) {
+    var T = DATA[task], el = document.getElementById("loop-" + task), isQ = task === "quotes";
+    var name = isQ ? "Quotes" : "Events", metric = isQ ? "first appearance correct" : "first report correct";
+    var L = T.lines.find(function (l) { return l.name === state.line[task]; }) || T.lines[0];
+    var main = T.lines[0];
+    var acc = main.rounds.reduce(function (n, r) { return n + r.proposals.filter(function (p) { return p.decision === "accepted"; }).length; }, 0);
+    var props = main.rounds.reduce(function (n, r) { return n + r.proposals.length; }, 0);
+    var h = '<div class="stack"><h3>' + name + "</h3>" + (T.reselect ? "" : "<p>" +
+      (main.rounds.length ? "Main line: " + main.rounds.length + " round" + (main.rounds.length === 1 ? "" : "s") + ", " + props + " proposal" + (props === 1 ? "" : "s") + ", " + acc + " kept. Best settings: " + esc(version(T.best_config)) + "."
+                          : "The loop on this task has a measured baseline and no finished rounds yet.") +
+      (T.same_config ? " No change has been kept yet, so the best settings are still the baseline." : "") + "</p>") + "</div>";
+    if (T.reselect) h += eventStory(T);
+    h += resultsTable(T);
+    if (T.reselect) h += reselectTable(T);
+    h += '<div class="stack"><div class="block-title"><h3 style="font-size:1.05rem">' + esc(metric[0].toUpperCase() + metric.slice(1)) + " on the training items, by round</h3>" +
+      (T.lines.length > 1 ? '<div class="linesel" role="group" aria-label="Loop line">' + T.lines.map(function (l) {
+        return '<button class="chip" data-task="' + task + '" data-line="' + esc(l.name) + '" aria-pressed="' + (l.name === L.name) + '">' + esc(LINE_NAMES[l.name] || l.name) + "</button>";
+      }).join("") + "</div>" : "") + "</div>";
+    h += '<div class="chart-legend"><span><i class="sw"></i>Current best, train</span><span><i class="sw val"></i>Current best, validation</span><span><i class="sw-dot acc"></i>Proposal kept</span><span><i class="sw-dot rej"></i>Proposal scored and rejected</span></div>';
+    h += loopChart(L, metric);
+    if (L.start) {
+      var nr = L.rounds.length, kept = L.rounds.some(function (r) { return r.accepted === true; });
+      h += '<p class="small muted">This line does not start from the baseline. It starts from the main line’s best settings (' + esc(version(L.start.from)) +
+        ") and traces a harder rewording of each statement: the speaker is described by role instead of named, and the gist is reworded. Its scores are on those harder queries" +
+        (L.start.gt_version ? " (ground truth v" + esc(L.start.gt_version) + ", " + L.start.n + " training items)" : "") +
+        ", so they are not comparable with the other lines. " + nr + " round" + (nr === 1 ? "" : "s") + " finished, " + (kept ? "a change was kept" : "nothing was kept") +
+        (L.start.recall_at_k != null ? ". The search put the true quote among the checker’s candidates for only " + pct(L.start.recall_at_k) + " of the training items" : "") + ".</p>";
+    }
+    if (L.marks.length) h += '<p class="small muted">The dotted line marks where the current best was re-scored (' + esc(L.marks.map(function (m) { return m.note.replace(/^re-scored: /, ""); }).join("; ")) +
+      "). Scores before it used fewer training items or an earlier version of the ground truth, so the step there is a change of yardstick, not a loss.</p>";
+    h += roundList(L, T) + "</div>";
+    el.innerHTML = h;
+  }
+  document.getElementById("loop").addEventListener("click", function (e) {
+    var c = e.target.closest(".chip[data-line]"); if (!c) return;
+    state.line[c.dataset.task] = c.dataset.line;
+    renderLoop(c.dataset.task);
+  });
+
+  // ---------- method ----------
+  var A = DATA.gt_audit, G = DATA.gt_review;
+  if (G) {
+    document.getElementById("gt-v").textContent = "v" + G.gt_version;
+    document.getElementById("audit").innerHTML = [[G.reviewed, "earlier answers reviewed by the labeller"], [G.accepted, "accepted as genuine earlier reports"],
+      [G.audit_agree + " / " + G.audit_n, "reviews the Fable audit agreed with"], ["≈" + Math.round(100 * G.accepted_precision) + "%", "of accepted earlier reports confirmed"]]
+      .map(function (x) { return "<div><b>" + x[0] + "</b><span>" + esc(x[1]) + "</span></div>"; }).join("");
+    document.getElementById("audit-text").textContent = "The audit re-judged all " + G.audit_accepted + " accepted and " + G.audit_rejected + " of the rejected reviews (ground truth v" + G.gt_version + ")." +
+      (A ? " An earlier spot check of " + A.n + " labels on ground truth v3.2 found " + A.earlier_missed + " with an earlier report the labeller had missed (" + A.within_hour + " of them by an hour or less), " +
+        A.wrong_event + " wrong event and " + A.not_event + " that was not a discrete event." : "");
+  } else {
+    document.getElementById("audit").innerHTML = [[A.right, "fully right"], [A.earlier_missed, "had an earlier report the label missed"], [A.wrong_event, "wrong event"], [A.not_event, "not a discrete event"]]
+      .map(function (x) { return "<div><b>" + x[0] + "</b><span>" + esc(x[1]) + "</span></div>"; }).join("");
+    document.getElementById("audit-text").textContent = "Audit of a fresh sample of " + A.n + " labelled items, reviewed by two Claude Fable agents. Of the " + A.earlier_missed +
+      " with an earlier report, " + A.within_hour + " were earlier by an hour or less.";
+  }
+  document.getElementById("built").textContent = "Built " + DATA.built + " from precomputed traces. Quotes: best " + DATA.quotes.best_config + " vs baseline " + DATA.quotes.base_config +
+    ". Events: " + bestWord(DATA.events) + " " + DATA.events.best_config + " vs baseline " + DATA.events.base_config + ". No live model calls happen on this page.";
+
+  renderTask();
+  renderLoop("quotes");
+  renderLoop("events");
+})();
+</script>

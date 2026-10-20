@@ -1,0 +1,46 @@
+{
+  "best_version": 0,
+  "best_config": "experiments_event/configs/v0.json",
+  "round": 3,
+  "threshold": 4,
+  "noise": {
+    "flips": 4,
+    "fixed": 3,
+    "broken": 1,
+    "n": 130
+  },
+  "train_metrics": {
+    "n": 130,
+    "recall_at_k": 0.6461538461538462,
+    "verifier_recall": 0.7738095238095238,
+    "first_report": 0.43846153846153846,
+    "early": 0.12307692307692308,
+    "late": 0.3923076923076923,
+    "none": 0.046153846153846156,
+    "calls_per_claim": 1.9,
+    "new_calls": 0
+  },
+  "val_metrics": {
+    "n": 63,
+    "recall_at_k": 0.6031746031746031,
+    "verifier_recall": 0.8947368421052632,
+    "first_report": 0.47619047619047616,
+    "early": 0.09523809523809523,
+    "late": 0.2698412698412698,
+    "none": 0.15873015873015872,
+    "calls_per_claim": 1.8571428571428572,
+    "new_calls": 0
+  },
+  "baseline_test": {
+    "n": 130,
+    "recall_at_k": 0.6384615384615384,
+    "verifier_recall": 0.8433734939759037,
+    "first_report": 0.4846153846153846,
+    "early": 0.09230769230769231,
+    "late": 0.34615384615384615,
+    "none": 0.07692307692307693,
+    "calls_per_claim": 1.9,
+    "new_calls": 0
+  },
+  "gt_version": 3.3
+}

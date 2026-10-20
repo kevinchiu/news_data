@@ -44,12 +44,13 @@ def get(cfg, path):
     return cfg
 
 
-def apply(cfg, changes):
+def apply(cfg, changes, allowed=None):
     """Return a new config with changes [{"path", "value"}] applied; raises ValueError if any is not allowed."""
+    allowed = allowed or ALLOWED
     new = copy.deepcopy(cfg)
     for ch in changes:
         path, value = ch["path"], ch["value"]
-        if path not in ALLOWED or not ALLOWED[path](value):
+        if path not in allowed or not allowed[path](value):
             raise ValueError(f"change not allowed: {path} = {json.dumps(value)[:200]}")
         node = new
         parts = path.split(".")

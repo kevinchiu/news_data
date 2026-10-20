@@ -1,0 +1,17 @@
+{
+  "retrieval": {
+    "k": 30,
+    "pool": 4,
+    "query_template": "raw"
+  },
+  "verify": {
+    "model": "claude-haiku-5-5",
+    "effort": "low",
+    "batch": 15,
+    "prompt": "@prompts/verify_event.txt",
+    "show_date": true,
+    "show_source": false,
+    "show_copies": false,
+    "order": "score"
+  }
+}
