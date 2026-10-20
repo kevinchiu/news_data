@@ -6,6 +6,15 @@ let a self-improvement loop tune the tracer against a benchmark whose answers ar
 All LLM calls run through headless Claude Code (`claude -p`) on a Claude subscription, and are
 cached in `data/cache/llm.sqlite`, so re-runs are free.
 
+## Demo
+
+**[docs/demo/demo.html](docs/demo/demo.html)**: a self-contained offline page, with no server and
+no model calls. It has 80 precomputed traces from the held-out sets (40 quotes and 40 news events).
+Search or pick one to see the first report the tracer found, the benchmark's answer and how the
+story spread. Download it and open it in a browser, since GitHub shows HTML files as source. The
+longer write-up, covering the improvement loop's history and the scores, is
+[docs/demo/index.html](docs/demo/index.html). See [Running the demo](#running-the-demo) to rebuild them.
+
 ## Presentation
 
 *Who said it first?* is a 10-slide deck covering the problem, the data, the tracer, the
